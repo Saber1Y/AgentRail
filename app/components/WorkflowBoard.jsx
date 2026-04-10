@@ -10,15 +10,66 @@ function getWorkflow(key) {
   return workflowCases.find((item) => item.key === key) ?? workflowCases[0];
 }
 
+function getDefaultDeliverables(key) {
+  const defaults = {
+    prospecting: [
+      { title: "Lead Shortlist", items: ["Company 1", "Company 2", "Company 3"] },
+      { title: "Buying Signals", items: ["Signal 1", "Signal 2"] },
+      { title: "Next Actions", items: ["Action 1", "Action 2"] },
+    ],
+    procurement: [
+      { title: "Vendor Shortlist", items: ["Vendor 1", "Vendor 2"] },
+      { title: "Risk Analysis", items: ["Risk 1", "Risk 2"] },
+      { title: "Decision Factors", items: ["Factor 1", "Factor 2"] },
+    ],
+    travel: [
+      { title: "Route Options", items: ["Option 1", "Option 2"] },
+      { title: "Key Considerations", items: ["Consideration 1"] },
+      { title: "Recommendation", items: ["Recommendation 1"] },
+    ],
+  };
+  return defaults[key] || defaults.prospecting;
+}
+
+function getDefaultMetrics(session, workflow) {
+  if (session?.totalCost) {
+    return [
+      { label: "Spend", value: session.totalCost },
+      { label: "Status", value: session.status === "settled" ? "Complete" : "Pending" },
+      { label: "Confidence", value: session.status === "settled" ? "95%" : "—" },
+    ];
+  }
+  return [
+    { label: "Est. Spend", value: "~0.50 XLM" },
+    { label: "Est. Time", value: "~2-5 min" },
+    { label: "Confidence", value: "—" },
+  ];
+}
+
 function buildPreviewPaymentStages(workflow) {
-  return workflow.steps.map((step, index) => ({
-    rail: step.rail,
-    label: step.title,
-    amount: step.amount,
-    detail: step.detail,
-    order: index + 1,
-    status: index === 0 ? "ready" : "queued",
-  }));
+  if (workflow.paymentTiers) {
+    return workflow.paymentTiers.map((tier, index) => ({
+      rail: tier.rail,
+      label: tier.purpose,
+      amount: `${tier.amount} XLM`,
+      detail: `Payment for ${tier.rail} operation`,
+      order: index + 1,
+      status: index === 0 ? "ready" : "queued",
+    }));
+  }
+  
+  if (workflow.steps) {
+    return workflow.steps.map((step, index) => ({
+      rail: step.rail,
+      label: step.title,
+      amount: step.amount,
+      detail: step.detail,
+      order: index + 1,
+      status: index === 0 ? "ready" : "queued",
+    }));
+  }
+  
+  return [];
 }
 
 function safeParseHistory(rawValue) {
@@ -79,8 +130,8 @@ function buildReceiptSnapshot(session, workflow, isSettled) {
   }
 
   const deliverables = isSettled
-    ? session.artifact?.deliverables ?? workflow.deliverables
-    : workflow.deliverables;
+    ? session.artifact?.deliverables ?? []
+    : currentSession?.deliverablesPreview ?? getDefaultDeliverables(workflow.key);
   const highlights = isSettled ? session.artifact?.highlights ?? [] : [];
 
   return {
@@ -398,7 +449,7 @@ export default function WorkflowBoard() {
   }
 
   const resultDeliverables =
-    run?.artifact?.deliverables ?? liveWorkflow.deliverables;
+    run?.artifact?.deliverables ?? currentSession?.deliverablesPreview ?? getDefaultDeliverables(activeKey);
 
   return (
     <div className="workflow-grid">
@@ -474,7 +525,7 @@ export default function WorkflowBoard() {
                 ? "Live receipt"
                 : "Template receipt"}
           </span>
-          <strong>{currentSession?.receipt ?? liveWorkflow.receipt}</strong>
+          <strong>{currentSession?.traceId ?? liveWorkflow.key.toUpperCase()}</strong>
           <p>
             {isSettled
               ? `Run ${run.runId} has been settled on the rail.`
@@ -498,8 +549,8 @@ export default function WorkflowBoard() {
                 : "Start paid run"}
           </button>
           <p className="helper-note">
-            The paid run simulates x402 authorization, MPP session hold, and
-            Stellar settlement before generating the final artifact.
+            The paid run uses x402 + MPP for payments, executes the AI agent,
+            and anchors the receipt on Stellar testnet.
           </p>
         </div>
 
@@ -544,11 +595,11 @@ export default function WorkflowBoard() {
 
           {history.length ? (
             <div className="history-list">
-              {history.map((item) => (
+              {history.map((item, hIndex) => (
                 <button
                   type="button"
                   className="history-item"
-                  key={`${item.traceId}-${item.savedAt}`}
+                  key={`${item.traceId}-${item.savedAt}-${hIndex}`}
                   onClick={() => handleHistorySelect(item)}
                   aria-pressed={currentSession?.traceId === item.traceId}
                   aria-label={`Restore receipt ${item.traceId}`}
@@ -612,7 +663,7 @@ export default function WorkflowBoard() {
         ) : null}
 
         <div className="payment-stepper">
-          {paymentStages.map((stage) => (
+          {(paymentStages || []).map((stage) => (
             <article
               className={`payment-stage payment-stage-${stage.status}`}
               key={`${stage.order}-${stage.label}`}
@@ -648,7 +699,7 @@ export default function WorkflowBoard() {
         </div>
 
         <div className="metric-grid">
-          {(isSettled ? run.metrics : liveWorkflow.metrics).map((metric) => (
+          {getDefaultMetrics(currentSession, liveWorkflow).map((metric) => (
             <article className="metric-card" key={metric.label}>
               <span>{metric.label}</span>
               <strong>{metric.value}</strong>
@@ -663,20 +714,20 @@ export default function WorkflowBoard() {
               <span className="status-pill">Ready to copy</span>
             </div>
             <div className="deliverable-grid">
-              {resultDeliverables.map((deliverable) => (
-                <article className="deliverable-card" key={deliverable.title}>
+              {resultDeliverables.map((deliverable, dIndex) => (
+                <article className="deliverable-card" key={`${deliverable.title}-${dIndex}`}>
                   <span className="card-kicker">{deliverable.title}</span>
                   <ul>
-                    {deliverable.items.map((item) => (
-                      <li key={item}>{item}</li>
+                    {(deliverable.items || []).map((item, iIndex) => (
+                      <li key={`${item}-${iIndex}`}>{item}</li>
                     ))}
                   </ul>
                 </article>
               ))}
             </div>
             <div className="result-highlights">
-              {run.artifact.highlights.map((item) => (
-                <span className="result-chip" key={item}>
+              {(run.artifact.highlights || []).map((item, hIndex) => (
+                <span className="result-chip" key={`${item}-${hIndex}`}>
                   {item}
                 </span>
               ))}
@@ -684,12 +735,12 @@ export default function WorkflowBoard() {
           </div>
         ) : (
           <div className="deliverable-grid">
-            {resultDeliverables.map((deliverable) => (
-              <article className="deliverable-card" key={deliverable.title}>
-                <span className="card-kicker">{deliverable.title}</span>
-                <ul>
-                  {deliverable.items.map((item) => (
-                    <li key={item}>{item}</li>
+            {resultDeliverables.map((deliverable, dIndex) => (
+                <article className="deliverable-card" key={`${deliverable.title}-${dIndex}`}>
+                  <span className="card-kicker">{deliverable.title}</span>
+                  <ul>
+                    {(deliverable.items || []).map((item, iIndex) => (
+                      <li key={`${item}-${iIndex}`}>{item}</li>
                   ))}
                 </ul>
               </article>

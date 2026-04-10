@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  buildWorkflowQuote,
-  workflowCases,
-} from "../../lib/workflows";
+import { buildWorkflowQuote, workflowCases } from "../../lib/workflows";
 
 function isValidWorkflowKey(value) {
   return typeof value === "string" && workflowCases.some((item) => item.key === value);
@@ -37,7 +34,7 @@ export async function POST(request) {
     );
   }
 
-  const quote = buildWorkflowQuote({ workflowKey, objective });
+  const quote = await buildWorkflowQuote({ workflowKey, objective });
 
   return NextResponse.json({
     quote,

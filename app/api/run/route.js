@@ -29,7 +29,7 @@ export async function POST(request) {
     );
   }
 
-  const run = buildWorkflowRun({
+  const run = await buildWorkflowRun({
     quote: {
       ...quote,
       workflowKey,
