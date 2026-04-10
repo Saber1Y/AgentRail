@@ -2,6 +2,7 @@ import WorkflowBoard from "./components/WorkflowBoard";
 import LiveDemoWidget from "./components/LiveDemoWidget";
 import StatsCounter from "./components/StatsCounter";
 import HowItWorks from "./components/HowItWorks";
+import Navbar from "./components/Navbar";
 
 const heroStats = [
   { label: "Micro-payments", value: "x402" },
@@ -49,26 +50,7 @@ const routeSteps = [
 export default function Home() {
   return (
     <main className="page" id="top">
-      <header className="topbar">
-        <a className="brand" href="#top" aria-label="AgentRail home">
-          <span className="brand-mark">AR</span>
-          <span className="brand-copy">
-            <strong>AgentRail</strong>
-            <small>Paid agents on Stellar</small>
-          </span>
-        </a>
-
-        <nav className="nav" aria-label="Primary">
-          <a href="#product">Product</a>
-          <a href="#rails">Rails</a>
-          <a href="#workflow">Workflow</a>
-          <a href="#ship">Ship</a>
-        </nav>
-
-        <a className="button button-ghost" href="#workflow">
-          Open demo
-        </a>
-      </header>
+      <Navbar />
 
       <section className="hero">
         <div className="hero-copy">
