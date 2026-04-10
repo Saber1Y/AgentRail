@@ -219,6 +219,7 @@ export default function WorkflowBoard() {
     setRun(null);
     setError("");
     setRunError("");
+    setCopyState("");
   }
 
   function handleWorkflowChange(nextKey) {
@@ -234,6 +235,7 @@ export default function WorkflowBoard() {
     setRun(item.runId ? item : null);
     setError("");
     setRunError("");
+    setCopyState("");
   }
 
   async function generateQuote() {
@@ -246,6 +248,7 @@ export default function WorkflowBoard() {
 
     setError("");
     setRunError("");
+    setCopyState("");
     setQuote(null);
     setRun(null);
     setIsGenerating(true);
@@ -304,6 +307,7 @@ export default function WorkflowBoard() {
 
     setRunError("");
     setError("");
+    setCopyState("");
     setIsRunning(true);
 
     try {
