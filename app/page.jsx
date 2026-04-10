@@ -154,10 +154,10 @@ export default function Home() {
       <section id="workflow" className="section workflow-section">
         <div className="section-heading">
           <span className="eyebrow">Live preview</span>
-          <h2>Choose a workflow and watch the rails light up.</h2>
+          <h2>Build a quote and watch the rails light up.</h2>
           <p className="section-copy">
-            This scaffold already feels like the product. The next commits can
-            wire this board to live x402 and MPP endpoints.
+            Type the task, pick the workflow profile, and AgentRail will return
+            a live receipt plus a billable plan from the API route.
           </p>
         </div>
 

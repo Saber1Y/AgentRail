@@ -1,221 +1,198 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { defaultWorkflowKey, workflowCases } from "../lib/workflows";
 
-const cases = [
-  {
-    key: "prospecting",
-    label: "Prospecting",
-    route: "x402 + MPP + Stellar",
-    title: "Find 12 fintech leads in Lagos and surface buying signals.",
-    summary:
-      "A single prompt becomes a paid discovery flow. x402 opens the data source, MPP keeps the browser session alive, and Stellar records the receipt.",
-    receipt: "AR-2049-XLM",
-    metrics: [
-      { label: "Spend", value: "0.84 XLM" },
-      { label: "Time saved", value: "42m" },
-      { label: "Confidence", value: "91%" },
-    ],
-    steps: [
-      {
-        rail: "x402",
-        title: "Unlock enriched lead data",
-        amount: "0.12 XLM",
-        detail: "One HTTP payment opens the source for the agent.",
-      },
-      {
-        rail: "MPP",
-        title: "Hold the browser session",
-        amount: "0.69 XLM",
-        detail: "The session stays alive while the agent verifies contacts.",
-      },
-      {
-        rail: "stellar",
-        title: "Anchor the receipt",
-        amount: "0.03 XLM",
-        detail: "The settlement trail is visible and easy to audit.",
-      },
-    ],
-    deliverables: [
-      {
-        title: "Lead shortlist",
-        items: [
-          "Northstar Pay",
-          "Kite Ledger",
-          "Orbit Ops",
-          "Pioneer Stack",
-        ],
-      },
-      {
-        title: "Signals",
-        items: [
-          "Hiring for growth roles",
-          "Fresh integration pages",
-          "Visible expansion into new markets",
-        ],
-      },
-      {
-        title: "Next move",
-        items: [
-          "Send a warm intro prompt",
-          "Attach a one-paragraph value prop",
-          "Queue a follow-up research task",
-        ],
-      },
-    ],
-  },
-  {
-    key: "procurement",
-    label: "Procurement",
-    route: "x402 + Stellar",
-    title: "Compare 5 support vendors for a seed-stage SaaS team.",
-    summary:
-      "The agent pays only for the checks it needs, then returns a vendor shortlist with implementation risk and price bands.",
-    receipt: "AR-3017-XLM",
-    metrics: [
-      { label: "Spend", value: "0.57 XLM" },
-      { label: "Time saved", value: "36m" },
-      { label: "Confidence", value: "88%" },
-    ],
-    steps: [
-      {
-        rail: "x402",
-        title: "Unlock comparison source",
-        amount: "0.09 XLM",
-        detail: "A small request buys the initial vendor matrix.",
-      },
-      {
-        rail: "x402",
-        title: "Fetch pricing and docs",
-        amount: "0.31 XLM",
-        detail: "The agent collects pricing, onboarding, and SLA details.",
-      },
-      {
-        rail: "stellar",
-        title: "Write the settlement trail",
-        amount: "0.02 XLM",
-        detail: "The receipt is stored alongside the work history.",
-      },
-    ],
-    deliverables: [
-      {
-        title: "Vendor shortlist",
-        items: ["RelayDesk", "SignalHQ", "PulseQueue", "OrbitCare"],
-      },
-      {
-        title: "Risk notes",
-        items: [
-          "High setup effort",
-          "Slow enterprise onboarding",
-          "Missing team-level controls",
-        ],
-      },
-      {
-        title: "Decision angle",
-        items: [
-          "Lowest friction to pilot",
-          "Best support coverage",
-          "Clear upgrade path",
-        ],
-      },
-    ],
-  },
-  {
-    key: "travel",
-    label: "Travel",
-    route: "MPP + Stellar",
-    title: "Plan a flexible founder trip between Lagos and Nairobi.",
-    summary:
-      "MPP keeps the booking session alive while the agent searches options, compares layovers, and surfaces the safest route to buy.",
-    receipt: "AR-7842-XLM",
-    metrics: [
-      { label: "Spend", value: "1.08 XLM" },
-      { label: "Time saved", value: "51m" },
-      { label: "Confidence", value: "93%" },
-    ],
-    steps: [
-      {
-        rail: "MPP",
-        title: "Hold the booking session",
-        amount: "0.74 XLM",
-        detail: "The agent stays active while fares fluctuate.",
-      },
-      {
-        rail: "MPP",
-        title: "Compare route options",
-        amount: "0.32 XLM",
-        detail: "The browser session carries context across multiple tabs.",
-      },
-      {
-        rail: "stellar",
-        title: "Confirm the trail",
-        amount: "0.02 XLM",
-        detail: "Every booking decision leaves a receipt you can inspect later.",
-      },
-    ],
-    deliverables: [
-      {
-        title: "Route shortlist",
-        items: ["Direct if possible", "Fastest safe layover", "Budget backup"],
-      },
-      {
-        title: "Watchouts",
-        items: [
-          "Visa timing",
-          "Change fees",
-          "Early-morning connections",
-        ],
-      },
-      {
-        title: "Booking move",
-        items: [
-          "Reserve the flexible fare",
-          "Hold the backup option",
-          "Notify the team with the receipt",
-        ],
-      },
-    ],
-  },
-];
+function getWorkflow(key) {
+  return workflowCases.find((item) => item.key === key) ?? workflowCases[0];
+}
 
 export default function WorkflowBoard() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const active = cases[activeIndex];
+  const [activeKey, setActiveKey] = useState(defaultWorkflowKey);
+  const [objective, setObjective] = useState(getWorkflow(defaultWorkflowKey).title);
+  const [quote, setQuote] = useState(null);
+  const [error, setError] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  const activeWorkflow = getWorkflow(activeKey);
+  const liveWorkflow = quote ?? activeWorkflow;
+  const isLiveQuote = Boolean(quote);
+
+  useEffect(() => {
+    setObjective(activeWorkflow.title);
+    setQuote(null);
+    setError("");
+  }, [activeWorkflow.key]);
+
+  function handleWorkflowChange(nextKey) {
+    setActiveKey(nextKey);
+  }
+
+  async function generateQuote() {
+    const trimmedObjective = objective.trim();
+
+    if (!trimmedObjective) {
+      setError("Add a task so AgentRail can build a quote.");
+      return;
+    }
+
+    setError("");
+    setQuote(null);
+    setIsGenerating(true);
+
+    try {
+      const response = await fetch("/api/quote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          workflowKey: activeWorkflow.key,
+          objective: trimmedObjective,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Unable to generate the quote.");
+      }
+
+      startTransition(() => {
+        setQuote(data.quote);
+      });
+    } catch (caughtError) {
+      const message =
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Unable to generate the quote.";
+
+      setError(message);
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    startTransition(() => {
+      void generateQuote();
+    });
+  }
 
   return (
     <div className="workflow-grid">
       <section className="workflow-switcher card">
         <div className="panel-header">
-          <span>Demo route</span>
-          <span className="status-pill">{active.route}</span>
+          <span>Quote builder</span>
+          <span className="status-pill">
+            {isGenerating || isPending
+              ? "Building"
+              : isLiveQuote
+                ? "Live quote"
+                : "Template"}
+          </span>
         </div>
 
-        <h3>{active.title}</h3>
-        <p className="section-copy">{active.summary}</p>
+        <h3>Choose a workflow, write the brief, and generate a receipt.</h3>
+        <p className="section-copy">
+          AgentRail quotes are generated through a real Next.js route, so the
+          demo can show an honest request-response loop before any payment rail
+          integration lands.
+        </p>
 
         <div className="chip-row" aria-label="Workflow scenarios">
-          {cases.map((item, index) => (
+          {workflowCases.map((item) => (
             <button
               key={item.key}
               type="button"
-              className={index === activeIndex ? "chip chip-active" : "chip"}
-              onClick={() => setActiveIndex(index)}
-            >
-              {item.label}
-            </button>
+              className={item.key === activeKey ? "chip chip-active" : "chip"}
+            onClick={() => handleWorkflowChange(item.key)}
+            aria-pressed={item.key === activeKey}
+          >
+            {item.label}
+          </button>
           ))}
         </div>
 
+        <form className="workflow-form" onSubmit={handleSubmit}>
+          <label className="field">
+            <span>Objective</span>
+            <textarea
+              value={objective}
+              onChange={(event) => {
+                setObjective(event.target.value);
+                setError("");
+
+                if (quote) {
+                  setQuote(null);
+                }
+              }}
+              placeholder="Describe the work you want the agent to do"
+              rows={7}
+            />
+          </label>
+
+          <div className="form-foot">
+            <p className="helper-note">
+              x402 unlocks tools, MPP keeps sessions alive, and Stellar tracks
+              the settlement trail.
+            </p>
+            <button
+              className="button workflow-submit"
+              type="submit"
+              disabled={isGenerating || isPending}
+            >
+              {isGenerating || isPending ? "Generating..." : "Generate quote"}
+            </button>
+          </div>
+        </form>
+
+        {error ? <p className="error-note">{error}</p> : null}
+
         <div className="workflow-note">
-          <span className="eyebrow">Receipt</span>
-          <strong>{active.receipt}</strong>
-          <p>{active.label} flow ready to wire into live payment rails.</p>
+          <span className="eyebrow">{isLiveQuote ? "Live receipt" : "Template receipt"}</span>
+          <strong>{liveWorkflow.receipt}</strong>
+          <p>
+            {isLiveQuote
+              ? `Trace ${quote.traceId} is ready for the demo.`
+              : "Generate a live quote to attach a trace and plan."}
+          </p>
         </div>
       </section>
 
       <section className="workflow-panel card" aria-label="Workflow detail">
+        <div className="quote-header">
+          <div>
+            <span className="eyebrow">{isLiveQuote ? "Live quote" : "Preview"}</span>
+            <h3>{liveWorkflow.title}</h3>
+          </div>
+          <span className="status-pill">
+            {isLiveQuote ? "API generated" : "Template preset"}
+          </span>
+        </div>
+
+        <p className="section-copy">{liveWorkflow.summary}</p>
+
+        <div className="quote-meta">
+          <article className="quote-card">
+            <span>Objective</span>
+            <strong>{isLiveQuote ? quote.objectiveSummary : activeWorkflow.title}</strong>
+          </article>
+          <article className="quote-card">
+            <span>Trace ID</span>
+            <strong>{isLiveQuote ? quote.traceId : "Awaiting quote"}</strong>
+          </article>
+          <article className="quote-card">
+            <span>Rail mix</span>
+            <strong>{liveWorkflow.route}</strong>
+          </article>
+        </div>
+
         <div className="metric-grid">
-          {active.metrics.map((metric) => (
+          {liveWorkflow.metrics.map((metric) => (
             <article className="metric-card" key={metric.label}>
               <span>{metric.label}</span>
               <strong>{metric.value}</strong>
@@ -224,7 +201,7 @@ export default function WorkflowBoard() {
         </div>
 
         <ol className="timeline">
-          {active.steps.map((step) => (
+          {liveWorkflow.steps.map((step) => (
             <li className="timeline-item" key={step.title} data-rail={step.rail}>
               <span className="timeline-dot" aria-hidden="true" />
               <div className="timeline-copy">
@@ -237,7 +214,7 @@ export default function WorkflowBoard() {
         </ol>
 
         <div className="deliverable-grid">
-          {active.deliverables.map((deliverable) => (
+          {liveWorkflow.deliverables.map((deliverable) => (
             <article className="deliverable-card" key={deliverable.title}>
               <span className="card-kicker">{deliverable.title}</span>
               <ul>
