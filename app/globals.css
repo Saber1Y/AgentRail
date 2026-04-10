@@ -1289,6 +1289,53 @@ button {
   box-shadow: none;
 }
 
+/* Skeleton Loading */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-rounded {
+  border-radius: 50%;
+}
+
+.skeleton-card {
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-deliverable {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-list-item {
+  height: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+
 /* Stats Counter */
 .stats-counter {
   display: grid;

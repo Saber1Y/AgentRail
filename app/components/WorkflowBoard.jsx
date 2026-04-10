@@ -6,6 +6,26 @@ import { defaultWorkflowKey, workflowCases } from "../lib/workflows";
 const historyStorageKey = "agentrail:quote-history";
 const maxHistoryItems = 6;
 
+function Skeleton({ width = "100%", height = "20px", rounded = false }) {
+  return (
+    <div
+      className={`skeleton ${rounded ? "skeleton-rounded" : ""}`}
+      style={{ width, height }}
+    />
+  );
+}
+
+function SkeletonCard() {
+  return (
+    <div className="skeleton-card">
+      <Skeleton width="40%" height="16px" />
+      <Skeleton width="80%" height="24px" />
+      <Skeleton width="100%" height="14px" />
+      <Skeleton width="60%" height="14px" />
+    </div>
+  );
+}
+
 function getWorkflow(key) {
   return workflowCases.find((item) => item.key === key) ?? workflowCases[0];
 }
@@ -678,24 +698,40 @@ export default function WorkflowBoard() {
         ) : null}
 
         <div className="payment-stepper">
-          {(paymentStages || []).map((stage) => (
-            <article
-              className={`payment-stage payment-stage-${stage.status}`}
-              key={`${stage.order}-${stage.label}`}
-            >
-              <div className="payment-stage-head">
-                <span className="payment-stage-order">
-                  {String(stage.order).padStart(2, "0")}
-                </span>
-                <span className="payment-stage-status">
-                  {formatStageState(stage.status)}
-                </span>
-              </div>
-              <strong>{stage.label}</strong>
-              <p>{stage.detail}</p>
-              <span className="payment-stage-amount">{stage.amount}</span>
-            </article>
-          ))}
+          {isRunning ? (
+            <>
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="skeleton-card">
+                  <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    <Skeleton width="24px" height="24px" rounded />
+                    <Skeleton width="60%" height="16px" />
+                  </div>
+                  <Skeleton width="80%" height="18px" />
+                  <Skeleton width="100%" height="14px" />
+                  <Skeleton width="40%" height="14px" />
+                </div>
+              ))}
+            </>
+          ) : (
+            (paymentStages || []).map((stage) => (
+              <article
+                className={`payment-stage payment-stage-${stage.status}`}
+                key={`${stage.order}-${stage.label}`}
+              >
+                <div className="payment-stage-head">
+                  <span className="payment-stage-order">
+                    {String(stage.order).padStart(2, "0")}
+                  </span>
+                  <span className="payment-stage-status">
+                    {formatStageState(stage.status)}
+                  </span>
+                </div>
+                <strong>{stage.label}</strong>
+                <p>{stage.detail}</p>
+                <span className="payment-stage-amount">{stage.amount}</span>
+              </article>
+            ))
+          )}
         </div>
 
         <div className="quote-meta">
@@ -722,7 +758,20 @@ export default function WorkflowBoard() {
           ))}
         </div>
 
-        {isSettled ? (
+        {isRunning ? (
+          <div className="deliverable-grid">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="skeleton-deliverable">
+                <Skeleton width="50%" height="16px" />
+                <div className="skeleton-list">
+                  <Skeleton width="90%" height="14px" />
+                  <Skeleton width="75%" height="14px" />
+                  <Skeleton width="85%" height="14px" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : isSettled ? (
           <div className="result-artifact">
             <div className="result-artifact-head">
               <span className="eyebrow">Output artifact</span>
