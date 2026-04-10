@@ -1,7 +1,7 @@
 import StellarSDK from "@stellar/stellar-sdk";
 import { NextResponse } from "next/server";
 
-const TESTNET_RPC_URL = "https://soroban-testnet.stellar.org";
+const TESTNET_RPC_URL = "https://rpc.lightsail.network";
 
 export async function GET() {
   const secretKey = process.env.STELLAR_SECRET_KEY;
@@ -11,26 +11,20 @@ export async function GET() {
   }
   
   try {
-    // Test 1: Can we create a keypair?
     const keypair = StellarSDK.Keypair.fromSecret(secretKey);
-    const publicKey = keypair.publicKey();
+    const server = new StellarSDK.rpc.Server(TESTNET_RPC_URL);
     
-    // Test 2: Can we connect to the RPC?
-    const server = new StellarSDK.RpcServer(TESTNET_RPC_URL);
-    
-    // Test 3: Can we fetch the account?
-    const account = await server.getAccount(publicKey);
+    const account = await server.getAccount(keypair.publicKey());
     
     return NextResponse.json({
       success: true,
-      publicKey,
+      publicKey: keypair.publicKey(),
       sequence: account.sequenceNumber(),
-      rpcUrl: TESTNET_RPC_URL,
     });
   } catch (error) {
     return NextResponse.json({
       error: error.message,
-      stack: error.stack?.substring(0, 500),
+      name: error.name,
     });
   }
 }

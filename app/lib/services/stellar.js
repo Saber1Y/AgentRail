@@ -1,9 +1,7 @@
 import StellarSDK from "@stellar/stellar-sdk";
 
-const TESTNET_RPC_URL = "https://soroban-testnet.stellar.org";
-const TESTNET_NETWORK_PASSPHRASE = "Test SDF Network ; September 2015";
+const HORIZON_TESTNET_URL = "https://horizon-testnet.stellar.org";
 
-let server = null;
 let sourceKeypair = null;
 let initialized = false;
 
@@ -17,7 +15,6 @@ export function initStellar() {
 
   try {
     sourceKeypair = StellarSDK.Keypair.fromSecret(process.env.STELLAR_SECRET_KEY);
-    server = new StellarSDK.RpcServer(TESTNET_RPC_URL);
     console.log(`Stellar initialized with account: ${sourceKeypair.publicKey()}`);
     initialized = true;
     return true;
@@ -27,38 +24,31 @@ export function initStellar() {
   }
 }
 
-// Initialize on module load
 initStellar();
 
-export async function getAccount() {
-  if (!server || !sourceKeypair) {
-    return null;
-  }
-
-  try {
-    const account = await server.getAccount(sourceKeypair.publicKey());
-    return account;
-  } catch (error) {
-    console.error("Failed to fetch account:", error);
-    return null;
-  }
-}
-
 export async function submitPayment(destination, amount, memo = "") {
-  if (!server || !sourceKeypair) {
+  if (!sourceKeypair) {
     return simulatePayment(destination, amount, memo);
   }
 
   try {
-    const account = await getAccount();
-    if (!account) {
-      throw new Error("Failed to load account");
-    }
-
-    const transaction = new StellarSDK.TransactionBuilder(account, {
-      fee: StellarSDK.BASE_FEE,
-      networkPassphrase: TESTNET_NETWORK_PASSPHRASE,
-    })
+    const publicKey = sourceKeypair.publicKey();
+    
+    // Get account info
+    const accountResponse = await fetch(`${HORIZON_TESTNET_URL}/accounts/${publicKey}`);
+    const accountData = await accountResponse.json();
+    
+    // Create Account object
+    const account = new StellarSDK.Account(publicKey, accountData.sequence);
+    
+    // Build transaction
+    const transaction = new StellarSDK.TransactionBuilder(
+      account,
+      {
+        fee: "100",
+        networkPassphrase: "Test SDF Network ; September 2015",
+      }
+    )
       .addOperation(
         StellarSDK.Operation.payment({
           destination: destination,
@@ -72,34 +62,35 @@ export async function submitPayment(destination, amount, memo = "") {
 
     transaction.sign(sourceKeypair);
 
-    const result = await server.sendTransaction(transaction);
-    console.log("Payment submitted:", result);
+    // Get XDR and URL encode
+    const xdr = transaction.toXDR();
+    
+    // Submit
+    const submitResponse = await fetch(
+      `${HORIZON_TESTNET_URL}/transactions`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `tx=${encodeURIComponent(xdr)}`,
+      }
+    );
 
-    for (let i = 0; i < 10; i++) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const status = await server.getTransactionStatus(result.hash);
-      if (status.successful) {
-        return {
-          success: true,
-          hash: result.hash,
-          fee: transaction.fee,
-          amount: amount,
-          destination: destination,
-          memo: memo,
-          timestamp: new Date().toISOString(),
-        };
-      }
-      if (status.failed) {
-        throw new Error("Transaction failed");
-      }
+    const result = await submitResponse.json();
+    
+    if (result.error || result.status === "ERROR") {
+      throw new Error(result.error || result.detail);
     }
 
     return {
       success: true,
       hash: result.hash,
-      status: "pending",
+      fee: "100",
       amount: amount,
       destination: destination,
+      memo: memo,
+      timestamp: new Date().toISOString(),
     };
   } catch (error) {
     console.error("Payment failed:", error);
@@ -123,50 +114,26 @@ async function simulatePayment(destination, amount, memo) {
     destination: destination,
     memo: memo,
     timestamp: new Date().toISOString(),
-    note: "Simulated payment - set STELLAR_SECRET_KEY for real transactions",
   };
 }
 
 export async function createEscrowHold(amount, memo) {
-  if (!server || !sourceKeypair) {
-    return {
-      success: true,
-      simulated: true,
-      holdId: `hold_${Date.now()}`,
-      amount: amount,
-      memo: memo,
-      timestamp: new Date().toISOString(),
-    };
-  }
-
   return {
     success: true,
     simulated: true,
     holdId: `hold_${Date.now()}`,
     amount: amount,
     memo: memo,
-    note: "MPP escrow - simplified for demo",
+    timestamp: new Date().toISOString(),
   };
 }
 
 export async function settleHold(holdId, actualAmount) {
-  if (!server || !sourceKeypair) {
-    return {
-      success: true,
-      simulated: true,
-      holdId: holdId,
-      settledAmount: actualAmount,
-      timestamp: new Date().toISOString(),
-    };
-  }
-
   return {
     success: true,
     simulated: true,
     holdId: holdId,
     settledAmount: actualAmount,
-    note: "MPP settlement - simplified for demo",
+    timestamp: new Date().toISOString(),
   };
 }
-
-export { TESTNET_RPC_URL, TESTNET_NETWORK_PASSPHRASE };

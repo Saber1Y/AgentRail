@@ -85,32 +85,6 @@ The app combines:
 - x402 micropayments
 - MPP (Multi-Phase Payments)
 
-## Quick Start
-
-```bash
-bun install
-cp .env.example .env.local
-bun run dev
-```
-
-Open `http://localhost:3000`.
-
-## Environment
-
-Use `.env.local` for local development.
-
-Public browser-safe values:
-
-- None required for demo mode
-
-Server-only values:
-
-- `OPENAI_API_KEY` - OpenAI API key for AI execution
-- `STELLAR_SECRET_KEY` - Stellar testnet secret key
-- `STELLAR_PUBLIC_KEY` - Stellar testnet public key
-- `EXA_API_KEY` - Optional, for web search enrichment
-
-An example template is included in [.env.example](./.env.example).
 
 ## Demo Flow
 

@@ -74,14 +74,19 @@ function calculatePaymentAmounts(workflowKey, objectiveLength) {
 }
 
 function buildPaymentStages(tiers, payments = []) {
+  const stellarPayments = payments.filter(p => p.memo?.startsWith("Settle:"));
+  const hasStellarPayment = stellarPayments.length > 0;
+  const stellarHash = stellarPayments[0]?.hash || null;
+  
   return tiers.map((tier, index) => ({
     rail: tier.rail,
     label: tier.purpose,
     amount: `${tier.amount} XLM`,
     detail: `Payment for ${tier.rail} operation`,
     order: index + 1,
-    status: payments[index]?.status || "pending",
-    txHash: payments[index]?.hash || null,
+    status: (tier.rail === "stellar" && hasStellarPayment) ? "complete" : 
+            (tier.rail === "stellar" ? "pending" : "queued"),
+    txHash: tier.rail === "stellar" ? stellarHash : null,
   }));
 }
 
@@ -219,7 +224,7 @@ export async function buildWorkflowRun({ quote }) {
     for (const tier of paymentTiers) {
       if (tier.rail === "stellar") {
         const payment = await submitPayment(
-          process.env.STELLAR_PUBLIC_KEY || "GXXXXX",
+          process.env.STELLAR_PUBLIC_KEY,
           tier.amount,
           `Settle:${runId}`
         );
@@ -272,7 +277,7 @@ export async function buildWorkflowRun({ quote }) {
       totalAmount: `${finalCost.toFixed(2)} XLM`,
       settledAmount: `${settledAmount} XLM`,
       timestamp: new Date().toISOString(),
-      transactions: payments.filter(p => p.hash),
+      transactions: payments, // Return all payments, filter in UI
     },
   };
 }
