@@ -609,10 +609,34 @@ button {
 }
 
 .history-item {
+  appearance: none;
+  width: 100%;
+  text-align: left;
   padding: 14px 16px;
   border-radius: 16px;
   background: rgba(3, 8, 18, 0.55);
   border: 1px solid rgba(180, 208, 255, 0.08);
+  color: inherit;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.history-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(90, 216, 255, 0.24);
+  background: rgba(3, 8, 18, 0.7);
+}
+
+.history-item:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(90, 216, 255, 0.12);
+}
+
+.history-item[aria-pressed="true"] {
+  border-color: rgba(90, 216, 255, 0.36);
+  background: linear-gradient(180deg, rgba(6, 17, 30, 0.9), rgba(3, 8, 18, 0.7));
 }
 
 .history-top {

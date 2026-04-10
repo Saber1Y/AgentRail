@@ -81,14 +81,20 @@ export default function WorkflowBoard() {
     }
   }, [history, hasHydrated]);
 
-  useEffect(() => {
-    setObjective(activeWorkflow.title);
-    setQuote(null);
-    setError("");
-  }, [activeWorkflow.key]);
-
   function handleWorkflowChange(nextKey) {
     setActiveKey(nextKey);
+    setObjective(getWorkflow(nextKey).title);
+    setQuote(null);
+    setError("");
+  }
+
+  function handleHistorySelect(item) {
+    const workflow = getWorkflow(item.workflowKey);
+
+    setActiveKey(workflow.key);
+    setObjective(item.objective ?? workflow.title);
+    setQuote(item);
+    setError("");
   }
 
   async function generateQuote() {
@@ -249,9 +255,13 @@ export default function WorkflowBoard() {
           {history.length ? (
             <div className="history-list">
               {history.map((item) => (
-                <article
+                <button
+                  type="button"
                   className="history-item"
                   key={`${item.traceId}-${item.savedAt}`}
+                  onClick={() => handleHistorySelect(item)}
+                  aria-pressed={quote?.traceId === item.traceId}
+                  aria-label={`Restore receipt ${item.traceId}`}
                 >
                   <div className="history-top">
                     <strong>{item.workflowLabel ?? "AgentRail"}</strong>
@@ -262,7 +272,7 @@ export default function WorkflowBoard() {
                     <span>{item.traceId}</span>
                     <span>{item.route}</span>
                   </div>
-                </article>
+                </button>
               ))}
             </div>
           ) : (
