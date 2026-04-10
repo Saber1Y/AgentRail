@@ -1,5 +1,6 @@
 import WorkflowBoard from "./components/WorkflowBoard";
 import LiveDemoWidget from "./components/LiveDemoWidget";
+import StatsCounter from "./components/StatsCounter";
 
 const heroStats = [
   { label: "Micro-payments", value: "x402" },
@@ -110,6 +111,7 @@ export default function Home() {
             <p>{card.body}</p>
           </article>
         ))}
+        <StatsCounter />
       </section>
 
       <section id="rails" className="section split">
