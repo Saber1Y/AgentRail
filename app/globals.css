@@ -1336,6 +1336,186 @@ button {
   border-radius: 4px;
 }
 
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--panel-strong);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast-hidden {
+  animation: slideOut 0.3s ease forwards;
+}
+
+@keyframes slideOut {
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.toast-success {
+  border-color: rgba(110, 243, 186, 0.3);
+  background: linear-gradient(135deg, rgba(110, 243, 186, 0.1), transparent);
+}
+
+.toast-error {
+  border-color: rgba(255, 107, 107, 0.3);
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), transparent);
+}
+
+.toast-info {
+  border-color: rgba(90, 216, 255, 0.3);
+  background: linear-gradient(135deg, rgba(90, 216, 255, 0.1), transparent);
+}
+
+.toast-processing {
+  border-color: rgba(158, 124, 255, 0.3);
+  background: linear-gradient(135deg, rgba(158, 124, 255, 0.1), transparent);
+}
+
+.toast-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.toast-success .toast-icon {
+  background: var(--good);
+  color: var(--bg);
+}
+
+.toast-error .toast-icon {
+  background: #ff6b6b;
+  color: white;
+}
+
+.toast-info .toast-icon {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.toast-processing .toast-icon {
+  background: var(--accent-3);
+  color: var(--bg);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.toast-close:hover {
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .toast-container {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
+}
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-rounded {
+  border-radius: 50%;
+}
+
+.skeleton-card {
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-deliverable {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-list-item {
+  height: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+
 /* Stats Counter */
 .stats-counter {
   display: grid;

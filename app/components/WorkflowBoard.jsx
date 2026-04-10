@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { defaultWorkflowKey, workflowCases } from "../lib/workflows";
+import ToastContainer from "./Toast";
 
 const historyStorageKey = "agentrail:quote-history";
 const maxHistoryItems = 6;
@@ -237,6 +238,16 @@ export default function WorkflowBoard() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [toasts, setToasts] = useState([]);
+
+  function addToast(message, type = "success", duration = 4000) {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message, type, duration }]);
+  }
+
+  function removeToast(id) {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }
 
   const activeWorkflow = getWorkflow(activeKey);
   const currentSession = run ?? quote;
@@ -343,6 +354,7 @@ export default function WorkflowBoard() {
       }
 
       setQuote(data.quote);
+      addToast("Quote generated successfully!", "success");
       setHistory((currentHistory) => {
         const savedAt = new Date().toISOString();
         const nextHistory = [
@@ -363,6 +375,7 @@ export default function WorkflowBoard() {
           : "Unable to generate the quote.";
 
       setError(message);
+      addToast(message, "error");
     } finally {
       setIsGenerating(false);
     }
@@ -400,6 +413,12 @@ export default function WorkflowBoard() {
 
       setRun(data.run);
       setQuote(data.run);
+      addToast("Payment settled on Stellar!", "success");
+      
+      if (data.run.receipt?.transactions?.[0]?.hash) {
+        addToast("Transaction confirmed on blockchain", "info", 6000);
+      }
+      
       setHistory((currentHistory) => {
         const savedAt =
           currentHistory.find((item) => item.traceId === data.run.traceId)
@@ -422,6 +441,7 @@ export default function WorkflowBoard() {
           : "Unable to start the paid run.";
 
       setRunError(message);
+      addToast(message, "error");
     } finally {
       setIsRunning(false);
     }
@@ -812,6 +832,8 @@ export default function WorkflowBoard() {
           </div>
         )}
       </section>
+
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }
