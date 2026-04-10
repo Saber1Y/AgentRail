@@ -2,11 +2,53 @@
 
 import { useState, useEffect, useRef } from "react";
 
-const COUNTERS = [
-  { label: "Payments Settled", value: 1247, suffix: "+" },
-  { label: "Agents Powered", value: 89, suffix: "" },
-  { label: "XLM Volume", value: 342, prefix: "$", suffix: "" },
-  { label: "Avg Task Time", value: 24, suffix: "s" },
+const STATS_CONFIG = [
+  { 
+    label: "Payments Settled", 
+    value: 1247, 
+    suffix: "+",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 6v6l4 2"/>
+      </svg>
+    )
+  },
+  { 
+    label: "Agents Powered", 
+    value: 89, 
+    suffix: "",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+    )
+  },
+  { 
+    label: "XLM Volume", 
+    value: 342, 
+    prefix: "$",
+    suffix: "",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M16 8h-6a2 2 0 100 4h4a2 2 0 110 4H8"/>
+        <path d="M12 6v2m0 8v2"/>
+      </svg>
+    )
+  },
+  { 
+    label: "Avg Task Time", 
+    value: 24, 
+    suffix: "s",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      </svg>
+    )
+  },
 ];
 
 function AnimatedCounter({ target, prefix = "", suffix = "", isVisible }) {
@@ -62,8 +104,11 @@ export default function StatsCounter() {
 
   return (
     <div className="stats-counter" ref={ref}>
-      {COUNTERS.map((stat) => (
+      {STATS_CONFIG.map((stat) => (
         <div key={stat.label} className="stat-item">
+          <div className="stat-icon-wrapper">
+            <span className="stat-icon">{stat.icon}</span>
+          </div>
           <AnimatedCounter
             target={stat.value}
             prefix={stat.prefix}
