@@ -1,7 +1,47 @@
 import crypto from "node:crypto";
-import { submitPayment, createEscrowHold, settleHold } from "./services/stellar.js";
+import StellarSDK from "@stellar/stellar-sdk";
 import { executeWorkflow } from "./services/ai-agent.js";
-import { enrichProspectData, enrichWithWebSearch } from "./services/search.js";
+
+const HORIZON_TESTNET_URL = "https://horizon-testnet.stellar.org";
+
+async function submitPayment(destination, amount, memo) {
+  const secretKey = process.env.STELLAR_SECRET_KEY;
+  if (!secretKey) {
+    return { success: true, simulated: true, hash: `sim_${Date.now()}` };
+  }
+  
+  try {
+    const keypair = StellarSDK.Keypair.fromSecret(secretKey);
+    const accountResponse = await fetch(`${HORIZON_TESTNET_URL}/accounts/${keypair.publicKey()}`);
+    const accountData = await accountResponse.json();
+    const account = new StellarSDK.Account(keypair.publicKey(), accountData.sequence);
+    
+    const transaction = new StellarSDK.TransactionBuilder(account, {
+      fee: "100",
+      networkPassphrase: "Test SDF Network ; September 2015",
+    })
+      .addOperation(StellarSDK.Operation.payment({ destination, asset: StellarSDK.Asset.native(), amount: amount.toString() }))
+      .addMemo(StellarSDK.Memo.text(memo.substring(0, 28)))
+      .setTimeout(30)
+      .build();
+    
+    transaction.sign(keypair);
+    const xdr = transaction.toXDR();
+    const submitResponse = await fetch(`${HORIZON_TESTNET_URL}/transactions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `tx=${encodeURIComponent(xdr)}`,
+    });
+    const result = await submitResponse.json();
+    
+    if (result.error) throw new Error(result.error);
+    
+    return { success: true, hash: result.hash, amount, destination, memo };
+  } catch (error) {
+    console.error("Payment error:", error.message);
+    return { success: false, error: error.message };
+  }
+}
 
 export const workflowCases = [
   {
