@@ -1,4 +1,5 @@
 import WorkflowBoard from "./components/WorkflowBoard";
+import LiveDemoWidget from "./components/LiveDemoWidget";
 
 const heroStats = [
   { label: "Micro-payments", value: "x402" },
@@ -10,20 +11,17 @@ const featureCards = [
   {
     kicker: "Problem",
     title: "Agents stall at access walls.",
-    body:
-      "APIs, browser sessions, and premium tools are still trapped behind subscriptions or manual approvals. That breaks the flow of agentic work.",
+    body: "APIs, browser sessions, and premium tools are still trapped behind subscriptions or manual approvals. That breaks the flow of agentic work.",
   },
   {
     kicker: "Solution",
     title: "Charge per task, not per month.",
-    body:
-      "AgentRail makes the payment itself part of the workflow. Users only pay when the agent actually needs a tool or a session.",
+    body: "AgentRail makes the payment itself part of the workflow. Users only pay when the agent actually needs a tool or a session.",
   },
   {
     kicker: "Win condition",
     title: "Demo the settlement, not just the prompt.",
-    body:
-      "A sharp demo can show a business outcome, a visible payment trail, and a memorable product story in under two minutes.",
+    body: "A sharp demo can show a business outcome, a visible payment trail, and a memorable product story in under two minutes.",
   },
 ];
 
@@ -100,19 +98,7 @@ export default function Home() {
         </div>
 
         <aside className="hero-panel" aria-label="Workflow preview">
-          <div className="panel-header">
-            <span>Live route</span>
-            <span className="status-pill">Preview</span>
-          </div>
-
-          <ol className="route">
-            {routeSteps.map((step) => (
-              <li key={step.title}>
-                <strong>{step.title}</strong>
-                <span>{step.body}</span>
-              </li>
-            ))}
-          </ol>
+          <LiveDemoWidget />
         </aside>
       </section>
 
@@ -165,15 +151,6 @@ export default function Home() {
       </section>
 
       <section id="ship" className="section footer-cta">
-        <div>
-          <span className="eyebrow">Ship plan</span>
-          <h2>We build the story in small commits.</h2>
-          <p>
-            That keeps the repo easy to review and makes every milestone feel
-            like a real step toward the demo.
-          </p>
-        </div>
-
         <p className="footer-note">
           AgentRail <span aria-hidden="true">•</span> 2026
         </p>

@@ -662,6 +662,21 @@ export default function WorkflowBoard() {
           </div>
         ) : null}
 
+        {isSettled && run.receipt?.transactions?.[0]?.hash ? (
+          <div className="tx-banner">
+            <span className="eyebrow">Stellar Transaction</span>
+            <a 
+              href={`https://stellar.expert/testnet/tx/${run.receipt.transactions[0].hash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="tx-link"
+            >
+              {run.receipt.transactions[0].hash}
+            </a>
+            <span className="tx-verify">Click to verify on Stellar Expert</span>
+          </div>
+        ) : null}
+
         <div className="payment-stepper">
           {(paymentStages || []).map((stage) => (
             <article
