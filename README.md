@@ -1,11 +1,12 @@
 # AgentRail
 
-AgentRail is a hackathon prototype for agentic payments on Stellar.
+AgentRail is a paid-agent UI scaffold built with the latest Next.js app router and Bun.
 
-## Run
+## Run locally
 
 ```bash
-npm start
+bun install
+bun run dev
 ```
 
 Then open `http://localhost:3000`.
