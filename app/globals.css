@@ -575,6 +575,12 @@ button {
   margin: 10px 0 0;
 }
 
+.run-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
 .history-panel {
   margin-top: 18px;
   padding: 18px;
@@ -679,6 +685,23 @@ button {
   line-height: 1.6;
 }
 
+.result-banner {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(180, 208, 255, 0.08);
+}
+
+.result-banner strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
 .workflow-panel {
   display: grid;
   gap: 18px;
@@ -724,6 +747,88 @@ button {
   margin-top: 8px;
   line-height: 1.45;
   font-size: 1.02rem;
+}
+
+.payment-stepper {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.payment-stage {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(180, 208, 255, 0.08);
+  display: grid;
+  gap: 10px;
+}
+
+.payment-stage-ready {
+  border-color: rgba(90, 216, 255, 0.16);
+}
+
+.payment-stage-queued {
+  opacity: 0.85;
+}
+
+.payment-stage-complete {
+  border-color: rgba(110, 243, 186, 0.24);
+  background: linear-gradient(180deg, rgba(4, 20, 28, 0.88), rgba(3, 8, 18, 0.66));
+}
+
+.payment-stage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.payment-stage strong {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.payment-stage p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.payment-stage-amount {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.result-artifact {
+  display: grid;
+  gap: 14px;
+}
+
+.result-artifact-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.result-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.result-chip {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(90, 216, 255, 0.16);
+  background: rgba(90, 216, 255, 0.08);
+  color: var(--text);
+  font-size: 0.88rem;
 }
 
 .metric-grid {
@@ -880,7 +985,9 @@ button {
   }
 
   .stats,
-  .metric-grid {
+  .metric-grid,
+  .payment-stepper,
+  .result-banner {
     grid-template-columns: 1fr;
   }
 
@@ -912,5 +1019,10 @@ button {
 
   .workflow-submit {
     width: 100%;
+  }
+
+  .result-artifact-head {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

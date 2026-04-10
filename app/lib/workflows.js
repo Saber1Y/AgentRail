@@ -214,6 +214,8 @@ export function buildWorkflowQuote({ workflowKey, objective }) {
 
   return {
     ...template,
+    workflowKey: template.key,
+    workflowLabel: template.label,
     objective: finalObjective,
     objectiveSummary: summarizeObjective(finalObjective),
     traceId,
@@ -221,5 +223,64 @@ export function buildWorkflowQuote({ workflowKey, objective }) {
     status: template.route.includes("MPP")
       ? "session-reserved"
       : "request-unlocked",
+  };
+}
+
+function buildRunId(quote) {
+  return `RUN-${buildTraceId(
+    quote.traceId,
+    `${quote.workflowKey}:${quote.objective}`
+  )}`;
+}
+
+function buildPaymentStages(template) {
+  return template.steps.map((step, index) => ({
+    rail: step.rail,
+    label: step.title,
+    amount: step.amount,
+    detail: step.detail,
+    order: index + 1,
+    status: "complete",
+  }));
+}
+
+function buildArtifact(template, objective) {
+  const deliverableCount = template.deliverables.length;
+  const highlightItems = template.deliverables.flatMap(
+    (deliverable) => deliverable.items
+  );
+
+  return {
+    headline: `${template.label} result`,
+    summary: `Delivered ${deliverableCount} result blocks for ${summarizeObjective(
+      objective,
+      10
+    )}.`,
+    highlights: highlightItems.slice(0, 5),
+    deliverables: template.deliverables,
+  };
+}
+
+export function buildWorkflowRun({ quote }) {
+  const template = getWorkflowCase(quote.workflowKey ?? quote.key);
+  const objective = normalizeObjective(quote.objective) || template.title;
+  const runId = buildRunId({
+    traceId: quote.traceId ?? buildTraceId(template.key, objective),
+    workflowKey: template.key,
+    objective,
+  });
+  const settledAt = new Date().toISOString();
+
+  return {
+    ...quote,
+    workflowKey: template.key,
+    workflowLabel: template.label,
+    runId,
+    status: "settled",
+    settledAt,
+    settlementId: `${runId}-XLM`,
+    paymentStages: buildPaymentStages(template),
+    artifact: buildArtifact(template, objective),
+    runSummary: `Payment settled and ${template.deliverables.length} output blocks are ready to review.`,
   };
 }
