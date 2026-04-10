@@ -109,13 +109,15 @@ export default function StatsCounter() {
           <div className="stat-icon-wrapper">
             <span className="stat-icon">{stat.icon}</span>
           </div>
-          <AnimatedCounter
-            target={stat.value}
-            prefix={stat.prefix}
-            suffix={stat.suffix}
-            isVisible={isVisible}
-          />
-          <span className="stat-label">{stat.label}</span>
+          <div className="stat-info">
+            <AnimatedCounter
+              target={stat.value}
+              prefix={stat.prefix}
+              suffix={stat.suffix}
+              isVisible={isVisible}
+            />
+            <span className="stat-label">{stat.label}</span>
+          </div>
         </div>
       ))}
     </div>
