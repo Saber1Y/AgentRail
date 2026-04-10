@@ -1464,6 +1464,16 @@ button {
   opacity: 1;
 }
 
+.keyboard-hints {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 12px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  opacity: 0.7;
+}
+
 @media (max-width: 480px) {
   .toast-container {
     left: 16px;

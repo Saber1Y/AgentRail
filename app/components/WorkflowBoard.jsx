@@ -488,6 +488,61 @@ export default function WorkflowBoard() {
     void generateQuote();
   }
 
+  async function shareResult() {
+    if (!currentSession) {
+      addToast("Generate a quote first", "error");
+      return;
+    }
+
+    const shareData = {
+      title: `AgentRail: ${currentSession.workflowLabel}`,
+      text: `Check out my ${currentSession.workflowLabel} result!\nTrace: ${currentSession.traceId}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+        addToast("Shared successfully!", "success");
+      } else {
+        await navigator.clipboard.writeText(
+          `${shareData.text}\n${window.location.href}`
+        );
+        addToast("Copied to clipboard!", "success");
+      }
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        addToast("Could not share", "error");
+      }
+    }
+  }
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") return;
+      
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        if (currentSession && !isRunning && !isGenerating) {
+          void startPaidRun();
+        }
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "q") {
+        e.preventDefault();
+        if (!isGenerating) {
+          void generateQuote();
+        }
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        void copyReceiptPayload("json");
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentSession, isRunning, isGenerating]);
+
   const resultDeliverables =
     run?.artifact?.deliverables ?? currentSession?.deliverablesPreview ?? getDefaultDeliverables(activeKey);
 
@@ -611,6 +666,20 @@ export default function WorkflowBoard() {
           >
             Copy JSON
           </button>
+          <button
+            type="button"
+            className="button button-soft"
+            onClick={() => void shareResult()}
+            disabled={!currentSession}
+          >
+            Share
+          </button>
+        </div>
+        
+        <div className="keyboard-hints">
+          <span>⌘+Q: Quote</span>
+          <span>⌘+Enter: Run</span>
+          <span>⌘+K: Copy JSON</span>
         </div>
 
         {copyState ? <p className="copy-note">{copyState}</p> : null}
