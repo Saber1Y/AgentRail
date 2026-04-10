@@ -520,14 +520,6 @@ export default function WorkflowBoard() {
           >
             Copy JSON
           </button>
-          <button
-            type="button"
-            className="button button-ghost"
-            onClick={clearHistory}
-            disabled={!history.length}
-          >
-            Clear history
-          </button>
         </div>
 
         {copyState ? <p className="copy-note">{copyState}</p> : null}
