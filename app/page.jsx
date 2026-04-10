@@ -112,6 +112,12 @@ export default function Home() {
             <p>{card.body}</p>
           </article>
         ))}
+      </section>
+
+      <section className="section">
+        <div className="section-heading">
+          <span className="eyebrow">By the numbers</span>
+        </div>
         <StatsCounter />
       </section>
 

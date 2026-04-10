@@ -1047,7 +1047,7 @@ button {
   .workflow-switcher,
   .workflow-panel,
   .footer-cta {
-    padding: 18px;
+    padding: 16px;
   }
 
   .stats,
@@ -1068,11 +1068,11 @@ button {
   }
 
   .hero-copy {
-    border-radius: 24px;
+    border-radius: 16px;
   }
 
   .hero h1 {
-    font-size: clamp(2.9rem, 16vw, 4.3rem);
+    font-size: clamp(2.2rem, 14vw, 3.5rem);
   }
 
   .timeline-item {
@@ -1090,6 +1090,233 @@ button {
   .result-artifact-head {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .stats-counter {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .stat-item {
+    width: 100%;
+    max-width: 280px;
+    min-width: auto;
+    justify-content: center;
+  }
+
+  .counter-value {
+    font-size: 1.4rem;
+  }
+
+  .how-step {
+    padding: 14px;
+  }
+
+  .how-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .how-flow {
+    padding: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .how-node {
+    width: 40px;
+    height: 40px;
+  }
+
+  .how-connector {
+    width: 16px;
+  }
+
+  .code-card pre {
+    font-size: 0.75rem;
+    overflow-x: auto;
+  }
+
+  .workflow-form {
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .field textarea {
+    min-height: 120px;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+  }
+
+  .workflow-submit {
+    min-width: auto;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+  }
+
+  .form-foot {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .helper-note {
+    max-width: none;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+
+  .workflow-note {
+    padding: 12px;
+  }
+
+  .workflow-note p {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 20px 0 48px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 16px 0 12px;
+  }
+
+  .hero h1 {
+    max-width: none;
+    font-size: clamp(2.5rem, 10vw, 4rem);
+  }
+
+  .hero-copy,
+  .hero-panel,
+  .card,
+  .code-card {
+    padding: 20px;
+  }
+
+  .hero-copy {
+    border-radius: 20px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .stats div {
+    padding: 12px 14px;
+  }
+
+  .grid-3 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .split {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .workflow-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .how-it-works {
+    grid-template-columns: 1fr;
+    padding: 24px 0;
+    gap: 24px;
+  }
+
+  .how-visual {
+    order: -1;
+  }
+
+  .how-flow {
+    padding: 20px;
+  }
+
+  .how-node {
+    width: 44px;
+    height: 44px;
+  }
+
+  .how-connector {
+    width: 20px;
+  }
+
+  .stats-counter {
+    gap: 20px;
+    padding: 24px 12px;
+  }
+
+  .stat-item {
+    flex: 1;
+    min-width: calc(50% - 10px);
+    padding: 12px 16px;
+  }
+
+  .counter-value {
+    font-size: 1.5rem;
+  }
+
+  .stat-icon-wrapper {
+    width: 40px;
+    height: 40px;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  .eyebrow,
+  .card-kicker {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+  }
+
+  .section h2 {
+    font-size: clamp(1.4rem, 5vw, 2rem);
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-actions .button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .demo-widget {
+    padding: 16px;
+  }
+
+  .demo-steps {
+    gap: 10px;
+  }
+
+  .demo-step {
+    padding: 10px 12px;
+  }
+
+  .section {
+    margin-top: 20px;
+  }
+
+  .section-heading {
+    padding: 0;
+    text-align: center;
+  }
+
+  .section-copy {
+    font-size: 0.95rem;
   }
 }
 
@@ -1476,11 +1703,11 @@ button {
 
 .theme-toggle {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 16px;
+  right: 16px;
   z-index: 100;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--panel);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1491,6 +1718,11 @@ button {
   justify-content: center;
   transition: all 0.2s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle svg {
+  width: 16px;
+  height: 16px;
 }
 
 .theme-toggle:hover {
@@ -1522,13 +1754,165 @@ button {
 }
 
 @media (max-width: 480px) {
-  .stats-counter {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+  .page {
+    padding: 16px 0 32px;
   }
-  
+
+  .hero {
+    padding: 12px 0 8px;
+    gap: 16px;
+  }
+
+  .hero-copy,
+  .hero-panel,
+  .card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.8rem, 12vw, 2.8rem);
+  }
+
+  .lede {
+    font-size: 0.9rem;
+  }
+
+  .stats-counter {
+    gap: 10px;
+    padding: 16px 8px;
+  }
+
+  .stat-item {
+    padding: 10px 12px;
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
   .counter-value {
-    font-size: 2rem;
+    font-size: 1.25rem;
+  }
+
+  .stat-icon-wrapper {
+    width: 36px;
+    height: 36px;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+  }
+
+  .how-step {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .how-content h4 {
+    font-size: 0.95rem;
+  }
+
+  .how-content p {
+    font-size: 0.8rem;
+  }
+
+  .how-flow {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .how-node {
+    width: 36px;
+    height: 36px;
+  }
+
+  .how-connector {
+    width: 12px;
+  }
+
+  .eyebrow,
+  .card-kicker {
+    font-size: 0.6rem;
+  }
+
+  .section h2 {
+    font-size: clamp(1.2rem, 5vw, 1.6rem);
+  }
+
+  .section-copy {
+    font-size: 0.88rem;
+  }
+
+  .grid-3 {
+    gap: 12px;
+  }
+
+  .card h2 {
+    font-size: 1.1rem;
+  }
+
+  .card p {
+    font-size: 0.85rem;
+  }
+
+  .demo-widget {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .demo-label {
+    font-size: 0.7rem;
+  }
+
+  .split > div {
+    padding: 16px;
+  }
+
+  .code-card pre {
+    font-size: 0.7rem;
+    line-height: 1.4;
+  }
+
+  .workflow-grid {
+    gap: 12px;
+  }
+
+  .workflow-switcher,
+  .workflow-panel {
+    padding: 14px;
+  }
+
+  .workflow-switcher h3 {
+    font-size: 1.2rem;
+  }
+
+  .field textarea {
+    min-height: 100px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    border-radius: 12px;
+  }
+
+  .workflow-submit {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+
+  .field span {
+    font-size: 0.7rem;
+  }
+
+  .workflow-note {
+    padding: 10px;
+  }
+
+  .workflow-note strong {
+    font-size: 0.8rem;
+  }
+
+  .workflow-note p {
+    font-size: 0.75rem;
   }
 }
 
