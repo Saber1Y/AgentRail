@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AgentRail</title>
+    <meta
+      name="description"
+      content="AgentRail is a paid-agent prototype for Stellar's agentic payments stack."
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <div class="backdrop backdrop-a"></div>
+    <div class="backdrop backdrop-b"></div>
+    <div class="grain"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="AgentRail home">
+        <span class="brand-mark">AR</span>
+        <span class="brand-copy">
+          <strong>AgentRail</strong>
+          <small>Paid agents on Stellar</small>
+        </span>
+      </a>
+
+      <nav class="nav">
+        <a href="#product">Product</a>
+        <a href="#rails">Rails</a>
+        <a href="#demo">Demo</a>
+        <a href="#ship">Ship</a>
+      </nav>
+
+      <a class="button button-ghost" href="#demo">Open demo</a>
+    </header>
+
+    <main id="top" class="page">
+      <section class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow">Hackathon concept</span>
+          <h1>Sell work, not just tokens.</h1>
+          <p class="lede">
+            AgentRail turns agent tasks into billable workflows. x402 unlocks
+            one-off tools, MPP handles longer sessions, and Stellar records the
+            settlement trail.
+          </p>
+
+          <div class="hero-actions">
+            <a class="button" href="#demo">Try the workflow</a>
+            <a class="button button-soft" href="#ship">See the build plan</a>
+          </div>
+
+          <dl class="stats">
+            <div>
+              <dt>Micro-payments</dt>
+              <dd>x402</dd>
+            </div>
+            <div>
+              <dt>Session billing</dt>
+              <dd>MPP</dd>
+            </div>
+            <div>
+              <dt>Settlement layer</dt>
+              <dd>Stellar</dd>
+            </div>
+          </dl>
+        </div>
+
+        <aside class="hero-panel" aria-label="Workflow preview">
+          <div class="panel-header">
+            <span>Live route</span>
+            <span class="status-pill">Preview</span>
+          </div>
+          <ol class="route">
+            <li>
+              <strong>Prompt enters the rail</strong>
+              <span>User asks for research, outreach, or booking.</span>
+            </li>
+            <li>
+              <strong>Payment gates open access</strong>
+              <span>Small unlocks flow through x402 or MPP.</span>
+            </li>
+            <li>
+              <strong>Agent completes the work</strong>
+              <span>Tools, browser sessions, and data calls get paid.</span>
+            </li>
+            <li>
+              <strong>Receipt lands on Stellar</strong>
+              <span>Every step gets a visible settlement trail.</span>
+            </li>
+          </ol>
+        </aside>
+      </section>
+
+      <section id="product" class="section grid-3">
+        <article class="card">
+          <span class="card-kicker">Problem</span>
+          <h2>Agents stall at access walls.</h2>
+          <p>
+            APIs, browsers, and long-running tools are still locked behind
+            subscriptions or manual approvals. That breaks the flow of agentic
+            work.
+          </p>
+        </article>
+        <article class="card">
+          <span class="card-kicker">Solution</span>
+          <h2>Charge per task, not per month.</h2>
+          <p>
+            AgentRail makes the payment itself part of the workflow. Users pay
+            only when the agent actually needs a tool or session.
+          </p>
+        </article>
+        <article class="card">
+          <span class="card-kicker">Win condition</span>
+          <h2>Demo the settlement, not just the prompt.</h2>
+          <p>
+            A sharp demo can show a real business outcome, a visible payment
+            trail, and a memorable product story in under two minutes.
+          </p>
+        </article>
+      </section>
+
+      <section id="rails" class="section split">
+        <div>
+          <span class="eyebrow">Rails</span>
+          <h2>Two payment modes, one agentic experience.</h2>
+          <p class="section-copy">
+            x402 is the quick unlock for HTTP-sized actions. MPP is the longer
+            session path for browser-driven or multi-step work. AgentRail wraps
+            both in a single product narrative.
+          </p>
+        </div>
+
+        <div class="code-card">
+          <div class="code-bar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <pre><code>prompt -&gt; paywall -&gt; tool -&gt; deliverable
+  x402     payment    agent      Stellar receipt
+  MPP      session    browser     settlement</code></pre>
+        </div>
+      </section>
+
+      <section id="demo" class="section demo-shell">
+        <div class="demo-copy">
+          <span class="eyebrow">Demo shell</span>
+          <h2>A paid-agent control room.</h2>
+          <p>
+            The first milestone gives us the product canvas. Next we wire the
+            workflow so the form actually generates a settlement story.
+          </p>
+          <ul class="checklist">
+            <li>Brand and hero layout</li>
+            <li>Clear payment-rail explanation</li>
+            <li>Reusable cards for the live demo</li>
+          </ul>
+        </div>
+
+        <div class="terminal">
+          <div class="terminal-head">
+            <span>agentrail://demo</span>
+            <span>ready</span>
+          </div>
+          <div class="terminal-body">
+            <p>&gt; task: research, pay, settle</p>
+            <p>&gt; state: scaffolded</p>
+            <p>&gt; next: add live workflow simulation</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="ship" class="section footer-cta">
+        <div>
+          <span class="eyebrow">Ship plan</span>
+          <h2>We build the story in small commits.</h2>
+          <p>
+            That keeps the repo easy to review and makes every milestone feel
+            like a real step toward the demo.
+          </p>
+        </div>
+        <p class="footer-note">AgentRail &copy; <span data-year></span></p>
+      </section>
+    </main>
+  </body>
+</html>
