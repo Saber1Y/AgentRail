@@ -1695,9 +1695,10 @@ button {
   display: flex;
   justify-content: center;
   gap: 48px;
-  padding: 32px 0;
+  padding: 32px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   margin-top: 48px;
+  flex-wrap: wrap;
 }
 
 .stat-item {

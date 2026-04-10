@@ -4,22 +4,42 @@ import { useState, useEffect, useRef } from "react";
 
 const STEPS = [
   {
-    icon: "📝",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5z"/>
+      </svg>
+    ),
     title: "Describe Task",
     description: "User inputs their objective or task",
   },
   {
-    icon: "💳",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+        <line x1="1" y1="10" x2="23" y2="10"/>
+      </svg>
+    ),
     title: "Payment",
     description: "x402 or MPP unlocks required tools",
   },
   {
-    icon: "🤖",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0110 0v4"/>
+      </svg>
+    ),
     title: "AI Executes",
     description: "Agent performs the work",
   },
   {
-    icon: "✅",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+        <polyline points="22,4 12,14.01 9,11.01"/>
+      </svg>
+    ),
     title: "Settlement",
     description: "Receipt anchored on Stellar",
   },
@@ -77,9 +97,8 @@ export default function HowItWorks() {
       <div className="how-visual">
         <div className="how-flow">
           {STEPS.map((step, i) => (
-            <>
+            <div key={i} style={{ display: "contents" }}>
               <div
-                key={i}
                 className={`how-node ${activeStep >= i ? "lit" : ""}`}
               >
                 {step.icon}
@@ -89,7 +108,7 @@ export default function HowItWorks() {
                   className={`how-connector ${activeStep > i ? "lit" : ""}`}
                 />
               )}
-            </>
+            </div>
           ))}
         </div>
       </div>
