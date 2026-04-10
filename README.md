@@ -12,7 +12,7 @@
   <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs" />
   <img alt="React" src="https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white" />
   <img alt="Stellar" src="https://img.shields.io/badge/Stellar-XLM-7D00FF?logo=stellar" />
-  <img alt="OpenAI" src="https://img.shields.io/badge/OpenAI-GPT--4-412991?logo=openai" />
+  <img alt="OpenRouter" src="https://img.shields.io/badge/OpenRouter-Llama%203.1-FF6B35?logo=data:image/svg+xml" />
   <img alt="x402" src="https://img.shields.io/badge/x402-Micro--payments-FF6B35" />
   <img alt="Bun" src="https://img.shields.io/badge/Bun-Runtime-FBF000?logo=bun" />
 </p>
@@ -24,7 +24,7 @@ AgentRail is a **production-ready MVP** for AI agent payments on Stellar. It dem
 The app combines:
 
 - A landing page showcasing the product loop
-- Real AI agent execution powered by GPT-4
+- Real AI agent execution powered by OpenRouter (Llama 3.1)
 - Stellar testnet payments (x402 + MPP patterns)
 - Dynamic quote generation and run settlement
 - Receipt history with local persistence
@@ -80,8 +80,8 @@ The app combines:
 - Next.js 16 (App Router)
 - React 19
 - Bun runtime
-- Stellar SDK
-- OpenAI GPT-4
+- Stellar SDK + Horizon API
+- OpenRouter (Llama 3.1)
 - x402 micropayments
 - MPP (Multi-Phase Payments)
 
@@ -99,17 +99,25 @@ The app combines:
 
 ```text
 app/
-├── page.jsx                    # Landing page
+├── page.jsx                    # Landing page with hero, stats, how-it-works
+├── layout.jsx                 # Root layout
+├── globals.css                # All styles
 ├── components/
-│   └── WorkflowBoard.jsx       # Main UI component
+│   ├── Navbar.jsx             # Responsive navigation
+│   ├── WorkflowBoard.jsx      # Main workflow UI
+│   ├── LiveDemoWidget.jsx     # Interactive demo widget
+│   ├── StatsCounter.jsx       # Animated statistics
+│   ├── HowItWorks.jsx         # Animated flow diagram
+│   └── Toast.jsx              # Notification system
 ├── api/
 │   ├── quote/route.js         # Quote generation API
-│   └── run/route.js           # Run execution API
+│   ├── run/route.js           # Paid run execution API
+│   └── test-payment/route.js  # Payment testing
 └── lib/
-    ├── workflows.js            # Workflow execution engine
+    ├── workflows.js            # Workflow definitions & execution
     └── services/
-        ├── stellar.js          # Stellar SDK integration
-        ├── ai-agent.js         # OpenAI integration
+        ├── stellar.js          # Stellar Horizon integration
+        ├── ai-agent.js         # OpenRouter integration
         └── search.js           # Web search enrichment
 ```
 
@@ -117,8 +125,7 @@ Key files:
 
 - `app/lib/workflows.js` - Workflow definitions and execution
 - `app/lib/services/stellar.js` - Stellar testnet payments
-- `app/lib/services/ai-agent.js` - GPT-4 agent execution
-- `app/lib/services/search.js` - Web search enrichment
+- `app/lib/services/ai-agent.js` - OpenRouter AI execution
 
 ## Payment Patterns
 
