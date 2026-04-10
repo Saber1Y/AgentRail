@@ -1,6 +1,7 @@
 import WorkflowBoard from "./components/WorkflowBoard";
 import LiveDemoWidget from "./components/LiveDemoWidget";
 import StatsCounter from "./components/StatsCounter";
+import HowItWorks from "./components/HowItWorks";
 
 const heroStats = [
   { label: "Micro-payments", value: "x402" },
@@ -137,6 +138,10 @@ export default function Home() {
   MPP      session    browser     settlement`}</code>
           </pre>
         </div>
+      </section>
+
+      <section className="section">
+        <HowItWorks />
       </section>
 
       <section id="workflow" className="section workflow-section">
