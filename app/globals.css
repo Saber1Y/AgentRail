@@ -581,6 +581,24 @@ button {
   margin-top: 18px;
 }
 
+.receipt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.receipt-actions .button {
+  min-width: 0;
+}
+
+.copy-note {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 0.9rem;
+}
+
 .history-panel {
   margin-top: 18px;
   padding: 18px;
@@ -598,6 +616,12 @@ button {
   gap: 14px;
 }
 
+.history-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .history-count {
   min-width: 32px;
   padding: 6px 10px;
@@ -607,6 +631,12 @@ button {
   color: var(--text);
   font-weight: 700;
   text-align: center;
+}
+
+.history-clear {
+  min-height: 36px;
+  padding-inline: 12px;
+  font-size: 0.82rem;
 }
 
 .history-list {

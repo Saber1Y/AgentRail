@@ -73,6 +73,85 @@ function formatReceiptStatus(item) {
   return "Quoted";
 }
 
+function buildReceiptSnapshot(session, workflow, isSettled) {
+  if (!session) {
+    return null;
+  }
+
+  const deliverables = isSettled
+    ? session.artifact?.deliverables ?? workflow.deliverables
+    : workflow.deliverables;
+  const highlights = isSettled ? session.artifact?.highlights ?? [] : [];
+
+  return {
+    workflowKey: session.workflowKey ?? workflow.key,
+    workflowLabel: session.workflowLabel ?? workflow.label,
+    receipt: session.receipt ?? workflow.receipt,
+    objective: session.objective ?? workflow.title,
+    objectiveSummary: session.objectiveSummary ?? workflow.title,
+    traceId: session.traceId,
+    status: session.status ?? (isSettled ? "settled" : "quoted"),
+    route: session.route ?? workflow.route,
+    generatedAt: session.generatedAt ?? null,
+    settledAt: session.settledAt ?? null,
+    runId: session.runId ?? null,
+    settlementId: session.settlementId ?? null,
+    runSummary: session.runSummary ?? null,
+    metrics: session.metrics ?? workflow.metrics,
+    paymentStages: session.paymentStages ?? buildPreviewPaymentStages(workflow),
+    highlights,
+    deliverables,
+  };
+}
+
+function buildReceiptSummary(snapshot) {
+  if (!snapshot) {
+    return "";
+  }
+
+  const lines = [
+    "AgentRail receipt",
+    `Workflow: ${snapshot.workflowLabel}`,
+    `Objective: ${snapshot.objectiveSummary}`,
+    `Trace ID: ${snapshot.traceId}`,
+    `Receipt: ${snapshot.receipt}`,
+    `Rail mix: ${snapshot.route}`,
+    `Status: ${snapshot.status}`,
+  ];
+
+  if (snapshot.runId) {
+    lines.push(`Run ID: ${snapshot.runId}`);
+  }
+
+  if (snapshot.settlementId) {
+    lines.push(`Settlement: ${snapshot.settlementId}`);
+  }
+
+  if (snapshot.runSummary) {
+    lines.push("");
+    lines.push(snapshot.runSummary);
+  }
+
+  if (snapshot.highlights?.length) {
+    lines.push("");
+    lines.push("Highlights:");
+    snapshot.highlights.forEach((item) => {
+      lines.push(`- ${item}`);
+    });
+  }
+
+  lines.push("");
+  lines.push("Deliverables:");
+  snapshot.deliverables.forEach((deliverable) => {
+    lines.push(`- ${deliverable.title}`);
+    deliverable.items.forEach((item) => {
+      lines.push(`  - ${item}`);
+    });
+  });
+
+  return lines.join("\n");
+}
+
 export default function WorkflowBoard() {
   const [activeKey, setActiveKey] = useState(defaultWorkflowKey);
   const [objective, setObjective] = useState(
@@ -83,6 +162,7 @@ export default function WorkflowBoard() {
   const [history, setHistory] = useState([]);
   const [error, setError] = useState("");
   const [runError, setRunError] = useState("");
+  const [copyState, setCopyState] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [hasHydrated, setHasHydrated] = useState(false);
@@ -272,6 +352,41 @@ export default function WorkflowBoard() {
     }
   }
 
+  async function copyReceiptPayload(mode) {
+    const snapshot = buildReceiptSnapshot(currentSession, liveWorkflow, isSettled);
+
+    if (!snapshot) {
+      setCopyState("Generate a quote first.");
+      return;
+    }
+
+    const payload =
+      mode === "json"
+        ? JSON.stringify(snapshot, null, 2)
+        : buildReceiptSummary(snapshot);
+
+    try {
+      await navigator.clipboard.writeText(payload);
+      setCopyState(
+        mode === "json" ? "Receipt JSON copied." : "Receipt summary copied."
+      );
+    } catch {
+      setCopyState("Copy failed. Try again on localhost.");
+    }
+  }
+
+  function clearHistory() {
+    setHistory([]);
+
+    try {
+      window.localStorage.removeItem(historyStorageKey);
+    } catch {
+      // Ignore persistence failures in the demo shell.
+    }
+
+    setCopyState("History cleared.");
+  }
+
   function handleSubmit(event) {
     event.preventDefault();
 
@@ -384,12 +499,51 @@ export default function WorkflowBoard() {
           </p>
         </div>
 
+        <div className="receipt-actions" aria-label="Receipt actions">
+          <button
+            type="button"
+            className="button button-soft"
+            onClick={() => void copyReceiptPayload("summary")}
+            disabled={!currentSession}
+          >
+            Copy summary
+          </button>
+          <button
+            type="button"
+            className="button button-soft"
+            onClick={() => void copyReceiptPayload("json")}
+            disabled={!currentSession}
+          >
+            Copy JSON
+          </button>
+          <button
+            type="button"
+            className="button button-ghost"
+            onClick={clearHistory}
+            disabled={!history.length}
+          >
+            Clear history
+          </button>
+        </div>
+
+        {copyState ? <p className="copy-note">{copyState}</p> : null}
+
         {runError ? <p className="error-note">{runError}</p> : null}
 
         <section className="history-panel" aria-label="Recent receipts">
           <div className="history-header">
             <span className="eyebrow">Recent receipts</span>
-            <span className="history-count">{history.length}</span>
+            <div className="history-header-actions">
+              <span className="history-count">{history.length}</span>
+              <button
+                type="button"
+                className="button button-ghost history-clear"
+                onClick={clearHistory}
+                disabled={!history.length}
+              >
+                Clear
+              </button>
+            </div>
           </div>
 
           {history.length ? (
