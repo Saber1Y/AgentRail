@@ -3,21 +3,83 @@
 import { useEffect, useState, useTransition } from "react";
 import { defaultWorkflowKey, workflowCases } from "../lib/workflows";
 
+const historyStorageKey = "agentrail:quote-history";
+const maxHistoryItems = 4;
+
 function getWorkflow(key) {
   return workflowCases.find((item) => item.key === key) ?? workflowCases[0];
+}
+
+function safeParseHistory(rawValue) {
+  if (typeof rawValue !== "string" || !rawValue) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(rawValue);
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.filter((item) => item && typeof item === "object");
+  } catch {
+    return [];
+  }
+}
+
+function formatSavedAt(savedAt) {
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(new Date(savedAt));
+  } catch {
+    return "Just now";
+  }
 }
 
 export default function WorkflowBoard() {
   const [activeKey, setActiveKey] = useState(defaultWorkflowKey);
   const [objective, setObjective] = useState(getWorkflow(defaultWorkflowKey).title);
   const [quote, setQuote] = useState(null);
+  const [history, setHistory] = useState([]);
   const [error, setError] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [hasHydrated, setHasHydrated] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const activeWorkflow = getWorkflow(activeKey);
   const liveWorkflow = quote ?? activeWorkflow;
   const isLiveQuote = Boolean(quote);
+
+  useEffect(() => {
+    try {
+      const storedHistory = safeParseHistory(
+        window.localStorage.getItem(historyStorageKey)
+      );
+
+      setHistory(storedHistory);
+    } catch {
+      setHistory([]);
+    } finally {
+      setHasHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasHydrated) {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(historyStorageKey, JSON.stringify(history));
+    } catch {
+      // Ignore persistence failures in the demo shell.
+    }
+  }, [history, hasHydrated]);
 
   useEffect(() => {
     setObjective(activeWorkflow.title);
@@ -61,6 +123,20 @@ export default function WorkflowBoard() {
 
       startTransition(() => {
         setQuote(data.quote);
+      });
+
+      setHistory((currentHistory) => {
+        const nextHistory = [
+          {
+            ...data.quote,
+            workflowKey: activeWorkflow.key,
+            workflowLabel: activeWorkflow.label,
+            savedAt: new Date().toISOString(),
+          },
+          ...currentHistory.filter((item) => item.traceId !== data.quote.traceId),
+        ];
+
+        return nextHistory.slice(0, maxHistoryItems);
       });
     } catch (caughtError) {
       const message =
@@ -109,11 +185,11 @@ export default function WorkflowBoard() {
               key={item.key}
               type="button"
               className={item.key === activeKey ? "chip chip-active" : "chip"}
-            onClick={() => handleWorkflowChange(item.key)}
-            aria-pressed={item.key === activeKey}
-          >
-            {item.label}
-          </button>
+              onClick={() => handleWorkflowChange(item.key)}
+              aria-pressed={item.key === activeKey}
+            >
+              {item.label}
+            </button>
           ))}
         </div>
 
@@ -153,7 +229,9 @@ export default function WorkflowBoard() {
         {error ? <p className="error-note">{error}</p> : null}
 
         <div className="workflow-note">
-          <span className="eyebrow">{isLiveQuote ? "Live receipt" : "Template receipt"}</span>
+          <span className="eyebrow">
+            {isLiveQuote ? "Live receipt" : "Template receipt"}
+          </span>
           <strong>{liveWorkflow.receipt}</strong>
           <p>
             {isLiveQuote
@@ -161,6 +239,39 @@ export default function WorkflowBoard() {
               : "Generate a live quote to attach a trace and plan."}
           </p>
         </div>
+
+        <section className="history-panel" aria-label="Recent receipts">
+          <div className="history-header">
+            <span className="eyebrow">Recent receipts</span>
+            <span className="history-count">{history.length}</span>
+          </div>
+
+          {history.length ? (
+            <div className="history-list">
+              {history.map((item) => (
+                <article
+                  className="history-item"
+                  key={`${item.traceId}-${item.savedAt}`}
+                >
+                  <div className="history-top">
+                    <strong>{item.workflowLabel ?? "AgentRail"}</strong>
+                    <span>{formatSavedAt(item.savedAt)}</span>
+                  </div>
+                  <p>{item.objectiveSummary}</p>
+                  <div className="history-meta">
+                    <span>{item.traceId}</span>
+                    <span>{item.route}</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="history-empty">
+              Every generated quote will land here so you can walk the judge
+              through the latest receipts.
+            </p>
+          )}
+        </section>
       </section>
 
       <section className="workflow-panel card" aria-label="Workflow detail">
@@ -179,7 +290,9 @@ export default function WorkflowBoard() {
         <div className="quote-meta">
           <article className="quote-card">
             <span>Objective</span>
-            <strong>{isLiveQuote ? quote.objectiveSummary : activeWorkflow.title}</strong>
+            <strong>
+              {isLiveQuote ? quote.objectiveSummary : activeWorkflow.title}
+            </strong>
           </article>
           <article className="quote-card">
             <span>Trace ID</span>

@@ -575,6 +575,86 @@ button {
   margin: 10px 0 0;
 }
 
+.history-panel {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(180, 208, 255, 0.08);
+  display: grid;
+  gap: 14px;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.history-count {
+  min-width: 32px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(90, 216, 255, 0.18);
+  background: rgba(90, 216, 255, 0.12);
+  color: var(--text);
+  font-weight: 700;
+  text-align: center;
+}
+
+.history-list {
+  display: grid;
+  gap: 10px;
+}
+
+.history-item {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(3, 8, 18, 0.55);
+  border: 1px solid rgba(180, 208, 255, 0.08);
+}
+
+.history-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.history-top strong {
+  font-size: 0.98rem;
+}
+
+.history-top span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.history-item p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.history-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.history-empty {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 .workflow-panel {
   display: grid;
   gap: 18px;
@@ -783,6 +863,11 @@ button {
   .quote-header,
   .form-foot {
     align-items: stretch;
+  }
+
+  .history-top {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .hero-copy {
