@@ -786,14 +786,14 @@ export default function WorkflowBoard() {
           <div className="tx-banner">
             <span className="eyebrow">Stellar Transaction</span>
             <a 
-              href={`https://stellar.expert/testnet/tx/${run.receipt.transactions[0].hash}`}
+              href={`https://horizon-testnet.stellar.org/transactions/${run.receipt.transactions[0].hash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="tx-link"
             >
               {run.receipt.transactions[0].hash}
             </a>
-            <span className="tx-verify">Click to verify on Stellar Expert</span>
+            <span className="tx-verify">Verified on Stellar Horizon</span>
           </div>
         ) : null}
 
