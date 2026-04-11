@@ -1,46 +1,57 @@
 import { NextResponse } from "next/server";
+import { buildWorkflowQuote, buildWorkflowRun } from "../../lib/workflows";
 
 export async function GET() {
-  const stellarSecret = process.env.STELLAR_SECRET_KEY;
-  const stellarPublic = process.env.STELLAR_PUBLIC_KEY;
-  const openRouterKey = process.env.OPENROUTER_API_KEY;
-  
   const results = {
-    stellar: {
-      hasSecret: !!stellarSecret,
-      hasPublic: !!stellarPublic,
-      secretPrefix: stellarSecret ? stellarSecret.substring(0, 8) + "..." : "none",
-      publicKey: stellarPublic || "none",
-    },
-    openRouter: {
-      hasKey: !!openRouterKey,
-      keyPrefix: openRouterKey ? openRouterKey.substring(0, 15) + "..." : "none",
-    },
-    testPayments: [],
+    quote: null,
+    run: null,
+    errors: [],
   };
   
-  // Test payment if we have keys
-  if (stellarSecret) {
-    try {
-      const StellarSDK = (await import("@stellar/stellar-sdk")).default;
-      const keypair = StellarSDK.Keypair.fromSecret(stellarSecret);
-      
-      results.stellar.keypairPublic = keypair.publicKey();
-      results.stellar.keypairMatch = keypair.publicKey() === stellarPublic;
-      
-      // Check account balance
-      const accountResponse = await fetch(`https://horizon-testnet.stellar.org/accounts/${keypair.publicKey()}`);
-      if (accountResponse.ok) {
-        const accountData = await accountResponse.json();
-        results.stellar.balance = accountData.balances?.find(b => b.asset_type === "native")?.balance || "0";
-        results.stellar.accountExists = true;
-      } else {
-        results.stellar.error = "Account not found on testnet";
-        results.stellar.accountExists = false;
-      }
-    } catch (error) {
-      results.stellar.error = error.message;
-    }
+  try {
+    // Step 1: Generate quote
+    console.log("[Test] Generating quote...");
+    const quote = await buildWorkflowQuote({
+      workflowKey: "prospecting",
+      objective: "Research 3 competitors for an AI coding assistant like Cursor.",
+    });
+    results.quote = {
+      traceId: quote.traceId,
+      status: quote.status,
+      totalCost: quote.totalCost,
+    };
+    console.log("[Test] Quote generated:", quote.traceId);
+    
+    // Step 2: Run the workflow
+    console.log("[Test] Starting workflow run...");
+    const run = await buildWorkflowRun({
+      quote: {
+        ...quote,
+        workflowKey: "prospecting",
+        objective: quote.objective,
+      },
+    });
+    
+    results.run = {
+      status: run.status,
+      success: run.artifact?.executionDetails?.success,
+      traceId: run.traceId,
+      runId: run.runId,
+      settledAt: run.settledAt,
+      totalCost: run.totalCost,
+      paymentStages: run.paymentStages,
+      aiResult: run.artifact?.executionDetails,
+      deliverables: run.artifact?.deliverables,
+      error: run.artifact?.executionDetails?.success === false ? "AI failed" : null,
+    };
+    
+    console.log("[Test] Run completed. Status:", run.status);
+    console.log("[Test] AI Success:", run.artifact?.executionDetails?.success);
+    
+  } catch (error) {
+    console.error("[Test] Error:", error);
+    results.errors.push(error.message);
+    results.errors.push(error.stack);
   }
   
   return NextResponse.json(results);
