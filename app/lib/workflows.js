@@ -7,7 +7,10 @@ const HORIZON_TESTNET_URL = "https://horizon-testnet.stellar.org";
 
 async function submitPayment(destination, amount, memo) {
   const secretKey = process.env.STELLAR_SECRET_KEY;
+  console.log("[Workflow] STELLAR_SECRET_KEY present:", !!secretKey);
+  
   if (!secretKey) {
+    console.log("[Workflow] No Stellar key - simulating payment");
     return { success: true, simulated: true, hash: `sim_${Date.now()}` };
   }
   
@@ -175,20 +178,31 @@ function buildRunId(traceId, workflowKey) {
 function transformAiResultToDeliverables(workflowKey, aiResult) {
   const result = aiResult.result || aiResult;
   
+  function normalizeItems(arr) {
+    if (!Array.isArray(arr)) return [];
+    return arr.map(item => {
+      if (typeof item === "string") return item;
+      if (typeof item === "object" && item !== null) {
+        return item.lead || item.action || item.name || JSON.stringify(item);
+      }
+      return String(item);
+    });
+  }
+  
   switch (workflowKey) {
     case "prospecting":
       return [
         {
           title: "Lead Shortlist",
-          items: result.leadShortlist || result.lead_shortlist || [],
+          items: normalizeItems(result.leadShortlist || result.lead_shortlist || []),
         },
         {
           title: "Buying Signals",
-          items: result.buyingSignals || result.buying_signals || [],
+          items: normalizeItems(result.buyingSignals || result.buying_signals || []),
         },
         {
           title: "Next Actions",
-          items: result.recommendedActions || result.recommended_actions || [],
+          items: normalizeItems(result.recommendedActions || result.recommended_actions || []),
         },
       ];
     
@@ -196,15 +210,15 @@ function transformAiResultToDeliverables(workflowKey, aiResult) {
       return [
         {
           title: "Vendor Shortlist",
-          items: result.vendorShortlist || result.vendor_shortlist || [],
+          items: normalizeItems(result.vendorShortlist || result.vendor_shortlist || []),
         },
         {
           title: "Risk Analysis",
-          items: result.riskNotes || result.risk_notes || [],
+          items: normalizeItems(result.riskNotes || result.risk_notes || []),
         },
         {
           title: "Decision Factors",
-          items: result.decisionFactors || result.decision_factors || [],
+          items: normalizeItems(result.decisionFactors || result.decision_factors || []),
         },
       ];
     
@@ -212,21 +226,21 @@ function transformAiResultToDeliverables(workflowKey, aiResult) {
       return [
         {
           title: "Route Options",
-          items: result.routeOptions || result.route_options || [],
+          items: normalizeItems(result.routeOptions || result.route_options || []),
         },
         {
           title: "Key Considerations",
-          items: result.keyConsiderations || result.key_considerations || [],
+          items: normalizeItems(result.keyConsiderations || result.key_considerations || []),
         },
         {
           title: "Booking Recommendation",
-          items: result.recommendedBooking ? [result.recommendedBooking] : [],
+          items: normalizeItems(result.recommendedBooking ? [result.recommendedBooking] : []),
         },
       ];
     
     default:
       return [
-        { title: "Results", items: Object.values(result).flat().slice(0, 5) },
+        { title: "Results", items: normalizeItems(Object.values(result).flat().slice(0, 5)) },
       ];
   }
 }
