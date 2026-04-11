@@ -985,9 +985,13 @@ button {
 }
 
 .deliverable-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.deliverable-card {
+  padding: 20px;
 }
 
 .deliverable-card ul {
