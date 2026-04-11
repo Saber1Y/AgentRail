@@ -10,7 +10,7 @@ export async function POST(request) {
 
   try {
     payload = await request.json();
-  } catch {
+  } catch (error) {
     return NextResponse.json(
       { error: "Send JSON with a quote payload." },
       { status: 400 }
@@ -29,15 +29,23 @@ export async function POST(request) {
     );
   }
 
-  const run = await buildWorkflowRun({
-    quote: {
-      ...quote,
-      workflowKey,
-      objective,
-    },
-  });
+  try {
+    const run = await buildWorkflowRun({
+      quote: {
+        ...quote,
+        workflowKey,
+        objective,
+      },
+    });
 
-  return NextResponse.json({
-    run,
-  });
+    return NextResponse.json({
+      run,
+    });
+  } catch (error) {
+    console.error("Build workflow run error:", error);
+    return NextResponse.json(
+      { error: `Run failed: ${error.message}` },
+      { status: 500 }
+    );
+  }
 }

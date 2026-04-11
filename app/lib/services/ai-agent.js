@@ -56,6 +56,10 @@ function extractJsonFromResponse(text) {
 async function callOpenRouter(prompt, model = "meta-llama/llama-3.1-8b-instruct") {
   const apiKey = process.env.OPENROUTER_API_KEY;
   
+  if (!apiKey) {
+    throw new Error("OPENROUTER_API_KEY not configured");
+  }
+
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -72,12 +76,22 @@ async function callOpenRouter(prompt, model = "meta-llama/llama-3.1-8b-instruct"
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`OpenRouter error: ${response.status} - ${error}`);
+    const errorText = await response.text().catch(() => "Unknown error");
+    throw new Error(`OpenRouter error: ${response.status} - ${errorText}`);
   }
 
-  const data = await response.json();
-  return data.choices[0]?.message?.content || "";
+  const responseText = await response.text();
+  
+  if (!responseText || responseText.trim() === "") {
+    throw new Error("Empty response from OpenRouter");
+  }
+
+  try {
+    const data = JSON.parse(responseText);
+    return data.choices[0]?.message?.content || "";
+  } catch {
+    throw new Error("Failed to parse OpenRouter response");
+  }
 }
 
 export async function executeWorkflow(workflowKey, objective) {

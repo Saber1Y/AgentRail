@@ -405,7 +405,18 @@ export default function WorkflowBoard() {
         }),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      
+      if (!text || text.trim() === "") {
+        throw new Error("Server returned empty response. Please try again.");
+      }
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error("Invalid response from server. Check console for details.");
+      }
 
       if (!response.ok) {
         throw new Error(data?.error || "Unable to start the paid run.");
