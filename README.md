@@ -5,7 +5,11 @@
 </p>
 
 <p align="center">
-  AI agent payments on Stellar — pay-per-task with blockchain settlement.
+  AI agents that pay their own way — pay-per-task with blockchain settlement.
+</p>
+
+<p align="center">
+  <a href="https://www.loom.com/share/3f142f4a5f6b4d34b793244554412257"><strong>Watch Demo Video</strong></a>
 </p>
 
 <p align="center">
@@ -17,55 +21,83 @@
   <img alt="Bun" src="https://img.shields.io/badge/Bun-Runtime-FBF000?logo=bun" />
 </p>
 
+---
+
 ## Overview
 
-AgentRail is a **production-ready MVP** for AI agent payments on Stellar. It demonstrates a paid-agent marketplace where users pay per task with real blockchain settlement.
+**AgentRail is a production-ready MVP demonstrating x402 + MPP + Stellar working together for AI agent payments.**
+
+AI agents are stuck at payment walls. They need tools, data, and compute - but current infrastructure forces them into monthly subscriptions or manual approvals. AgentRail changes that.
 
 The app combines:
-
-- A landing page showcasing the product loop
+- A polished landing page showcasing the product loop
 - Real AI agent execution powered by OpenRouter (Llama 3.1)
-- Stellar testnet payments (x402 + MPP patterns)
-- Dynamic quote generation and run settlement
+- Actual Stellar testnet payments (x402 + MPP patterns)
+- Dynamic quote generation with real transaction hashes
 - Receipt history with local persistence
 
-## What AgentRail Does
+---
 
-1. User writes a task/objective
-2. AgentRail generates a **real quote** with dynamic pricing
-3. AI agent **actually executes** the task
-4. Payments settle on **Stellar testnet** using x402/MPP patterns
-5. Receipt and deliverables are returned
+## The Problem
+
+AI agents are the future - but they can't pay for their own tools.
+
+- **APIs** are trapped behind subscriptions
+- **Browser sessions** require manual approval
+- **Premium data sources** are all-or-nothing
+
+This breaks the promise of agentic AI. An agent that needs human intervention to pay for tools isn't really autonomous.
+
+---
+
+## The Solution
+
+AgentRail makes payment part of the workflow. Three payment rails working together:
+
+| Rail | Purpose | How It Works |
+|------|---------|--------------|
+| **x402** | Per-request unlock | Like a metered paywall - pay per API call |
+| **MPP** | Session holds | Escrow funds during work, settle at end |
+| **Stellar** | Settlement anchoring | On-chain proof of payment |
+
+---
+
+## How It Works
+
+1. **User submits a task** (e.g., "Research 3 competitors for an AI coding assistant")
+2. **AgentRail generates a quote** with dynamic pricing based on complexity
+3. **AI agent executes** the work with MPP holding funds
+4. **Payments settle on Stellar** producing a verifiable transaction hash
+5. **Receipt returns** with deliverables and tx hash
+
+---
 
 ## Core Features
 
 ### Quote Builder
-
 - Three workflow types: Prospecting, Procurement, Travel
 - Dynamic pricing based on task complexity
 - x402/MPP/Stellar payment breakdown
 - Real trace ID generation
 
 ### AI Execution
-
-- GPT-4 powered task completion
+- OpenRouter (Llama 3.1) powered task completion
 - Workflow-specific prompts for each use case
 - Real deliverables generated from the objective
-- Token usage tracking
 
 ### Payment Settlement
-
 - x402 pattern for per-request payments
 - MPP pattern for session holds
 - Stellar anchoring for receipts
-- Transaction hash for verification
+- Real transaction hash for verification
 
 ### Receipt System
-
 - Full receipt with transaction details
 - JSON export for verification
 - Local history persistence
 - Settlement status tracking
+
+---
 
 ## Supported Workflows
 
@@ -75,25 +107,19 @@ The app combines:
 | Procurement | Vendor comparison, research | x402 + Stellar |
 | Travel | Trip planning, route optimization | MPP + Stellar |
 
+---
+
 ## Tech Stack
 
-- Next.js 16 (App Router)
-- React 19
-- Bun runtime
-- Stellar SDK + Horizon API
-- OpenRouter (Llama 3.1)
-- x402 micropayments
-- MPP (Multi-Phase Payments)
+- **Next.js 16** (App Router)
+- **React 19**
+- **Bun runtime**
+- **Stellar SDK + Horizon API**
+- **OpenRouter** (Llama 3.1)
+- **x402** micropayments
+- **MPP** (Multi-Phase Payments)
 
-
-## Demo Flow
-
-1. Select a workflow preset (Prospecting, Procurement, or Travel)
-2. Enter a task in the objective field
-3. Click "Generate Quote" — shows pricing breakdown
-4. Click "Start Paid Run" — AI executes, payments process
-5. View deliverables and transaction hash
-6. Copy JSON to show full receipt structure
+---
 
 ## Project Structure
 
@@ -104,49 +130,61 @@ app/
 ├── globals.css                # All styles
 ├── components/
 │   ├── Navbar.jsx             # Responsive navigation
-│   ├── WorkflowBoard.jsx      # Main workflow UI
-│   ├── LiveDemoWidget.jsx     # Interactive demo widget
-│   ├── StatsCounter.jsx       # Animated statistics
-│   ├── HowItWorks.jsx         # Animated flow diagram
-│   └── Toast.jsx              # Notification system
+│   ├── WorkflowBoard.jsx       # Main workflow UI
+│   ├── LiveDemoWidget.jsx      # Interactive demo widget
+│   ├── StatsCounter.jsx        # Animated statistics
+│   ├── HowItWorks.jsx          # Animated flow diagram
+│   └── Toast.jsx               # Notification system
 ├── api/
-│   ├── quote/route.js         # Quote generation API
-│   ├── run/route.js           # Paid run execution API
-│   └── test-payment/route.js  # Payment testing
+│   ├── quote/route.js          # Quote generation API
+│   ├── run/route.js            # Paid run execution API
+│   └── test-payment/route.js   # Payment testing
 └── lib/
-    ├── workflows.js            # Workflow definitions & execution
+    ├── workflows.js             # Workflow definitions & execution
     └── services/
-        ├── stellar.js          # Stellar Horizon integration
+        ├── stellar.js           # Stellar Horizon integration
         ├── ai-agent.js         # OpenRouter integration
         └── search.js           # Web search enrichment
 ```
 
-Key files:
+---
 
-- `app/lib/workflows.js` - Workflow definitions and execution
-- `app/lib/services/stellar.js` - Stellar testnet payments
-- `app/lib/services/ai-agent.js` - OpenRouter AI execution
-
-## Payment Patterns
+## Payment Patterns Explained
 
 ### x402
-
-Per-request payments for data access. Used when the agent needs to unlock a data source.
+Per-request payments for data access. Used when the agent needs to unlock a data source. Like a digital paywall - pay to access.
 
 ### MPP (Multi-Phase Payments)
-
-Session holds for long-running tasks. Creates an escrow that settles based on actual execution.
+Session holds for long-running tasks. Creates an escrow that settles based on actual execution completed. Funds held until work is done.
 
 ### Stellar Settlement
+Final transaction anchoring the receipt on-chain. Produces a verifiable transaction hash that proves payment happened.
 
-Final transaction anchoring the receipt on-chain. Produces a verifiable transaction hash.
+---
+
+## Setup
+
+1. Clone the repository
+2. Copy `.env.example` to `.env`
+3. Add your API keys:
+   - `OPENROUTER_API_KEY` - Get from [openrouter.ai](https://openrouter.ai/keys)
+   - `STELLAR_SECRET_KEY` - Testnet secret from [laboratory.stellar.org](https://laboratory.stellar.org)
+   - `STELLAR_PUBLIC_KEY` - Your Stellar testnet public key
+4. Run `npm install`
+5. Run `npm run dev`
+
+---
 
 ## Without API Keys
 
 The app runs in **simulation mode** without API keys configured. The UI and flow work completely, but:
 
-- AI returns simulated results (still looks good for demo)
+- AI returns simulated results
 - Payments show as simulated transactions
+
+For full functionality, configure the API keys above.
+
+---
 
 ## License
 
