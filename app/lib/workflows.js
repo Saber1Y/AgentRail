@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import StellarSDK from "@stellar/stellar-sdk";
 import { executeWorkflow } from "./services/ai-agent.js";
+import { createEscrowHold } from "./services/stellar.js";
 
 const HORIZON_TESTNET_URL = "https://horizon-testnet.stellar.org";
 
