@@ -1,15 +1,44 @@
 import { NextResponse } from "next/server";
 
+const WORKFLOW_PROMPTS = {
+  prospecting: (objective) => `You are a sales intelligence agent. Your task is to find potential customers (leads) that match the user's objective.
+
+User's objective: "${objective}"
+
+Research and return a JSON object with:
+{
+  "leadShortlist": ["Company names that match the criteria"],
+  "buyingSignals": ["Observable signals suggesting these companies are in market"],
+  "recommendedActions": ["Specific next steps to reach these leads"]
+}
+
+Focus on finding real, specific companies. Be concrete and actionable. Return ONLY valid JSON.`,
+};
+
+function extractJsonFromResponse(text) {
+  console.log("[Debug] Raw response:", text);
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    try {
+      return JSON.parse(jsonMatch[0]);
+    } catch (e) {
+      console.log("[Debug] JSON parse failed:", e.message);
+      return null;
+    }
+  }
+  console.log("[Debug] No JSON match found");
+  return null;
+}
+
 export async function GET() {
   const apiKey = process.env.OPENROUTER_API_KEY;
   
-  if (!apiKey) {
-    return NextResponse.json({ error: "No API key" }, { status: 500 });
-  }
+  const objective = "Research 3 competitors for an AI coding assistant like Cursor.";
+  const prompt = WORKFLOW_PROMPTS.prospecting(objective);
+  
+  console.log("[Debug] Sending prompt:", prompt);
   
   try {
-    console.log("[Test] Testing OpenRouter with key:", apiKey.substring(0, 10) + "...");
-    
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -20,14 +49,13 @@ export async function GET() {
       },
       body: JSON.stringify({
         model: "meta-llama/llama-3.1-8b-instruct",
-        messages: [{ role: "user", content: "Say 'hello' in one word" }],
-        max_tokens: 20,
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 2000,
       }),
     });
     
     const text = await response.text();
-    console.log("[Test] OpenRouter response status:", response.status);
-    console.log("[Test] OpenRouter response:", text.substring(0, 500));
+    console.log("[Debug] Full response:", text);
     
     let data;
     try {
@@ -36,18 +64,20 @@ export async function GET() {
       data = { raw: text };
     }
     
+    const content = data?.choices?.[0]?.message?.content || "";
+    const parsed = extractJsonFromResponse(content);
+    
     return NextResponse.json({
       status: response.status,
-      ok: response.ok,
-      hasKey: true,
-      keyPrefix: apiKey.substring(0, 10),
-      response: data,
+      rawContent: content,
+      parsedJson: parsed,
+      parseSuccess: !!parsed,
+      fullResponse: data,
     });
   } catch (error) {
-    console.error("[Test] OpenRouter error:", error);
+    console.error("[Debug] Error:", error);
     return NextResponse.json({
       error: error.message,
-      hasKey: true,
     }, { status: 500 });
   }
 }
