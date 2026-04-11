@@ -97,7 +97,11 @@ async function callOpenRouter(prompt, model = "meta-llama/llama-3.1-8b-instruct"
 export async function executeWorkflow(workflowKey, objective) {
   const apiKey = process.env.OPENROUTER_API_KEY;
   
+  console.log("[AI Agent] Starting execution for workflow:", workflowKey);
+  console.log("[AI Agent] API Key present:", !!apiKey, apiKey ? `starts with: ${apiKey.substring(0, 10)}...` : "none");
+  
   if (!apiKey) {
+    console.log("[AI Agent] No API key, using simulation");
     return simulateExecution(workflowKey, objective);
   }
 
@@ -109,11 +113,16 @@ export async function executeWorkflow(workflowKey, objective) {
   const prompt = promptTemplate(objective);
 
   try {
+    console.log("[AI Agent] Calling OpenRouter...");
     const text = await callOpenRouter(prompt);
+    console.log("[AI Agent] Response received, length:", text?.length || 0);
+    
     const result_data = extractJsonFromResponse(text);
+    console.log("[AI Agent] Parsed result:", result_data ? "success" : "null");
 
     if (!result_data) {
-      console.warn("Failed to parse JSON from response, using simulated data");
+      console.warn("[AI Agent] Failed to parse JSON from response, using simulated data");
+      console.warn("[AI Agent] Raw response:", text?.substring(0, 500));
       return simulateExecution(workflowKey, objective);
     }
 
@@ -125,7 +134,7 @@ export async function executeWorkflow(workflowKey, objective) {
       executedAt: new Date().toISOString(),
     };
   } catch (error) {
-    console.error("AI execution failed:", error);
+    console.error("[AI Agent] Execution failed:", error.message);
     return {
       success: false,
       error: error.message,

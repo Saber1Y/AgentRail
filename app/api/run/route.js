@@ -30,6 +30,9 @@ export async function POST(request) {
   }
 
   try {
+    console.log("[API/Run] Starting paid run...");
+    console.log("[API/Run] Quote received:", { workflowKey, traceId, objective });
+    
     const run = await buildWorkflowRun({
       quote: {
         ...quote,
@@ -38,11 +41,15 @@ export async function POST(request) {
       },
     });
 
+    console.log("[API/Run] Run completed, status:", run.status);
+    console.log("[API/Run] Returning run:", JSON.stringify(run, null, 2));
+
     return NextResponse.json({
       run,
     });
   } catch (error) {
-    console.error("Build workflow run error:", error);
+    console.error("[API/Run] Build workflow run error:", error);
+    console.error("[API/Run] Stack:", error.stack);
     return NextResponse.json(
       { error: `Run failed: ${error.message}` },
       { status: 500 }

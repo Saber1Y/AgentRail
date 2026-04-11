@@ -232,6 +232,9 @@ function transformAiResultToDeliverables(workflowKey, aiResult) {
 }
 
 export async function buildWorkflowRun({ quote }) {
+  console.log("[Workflow] Starting buildWorkflowRun");
+  console.log("[Workflow] Quote:", JSON.stringify(quote, null, 2));
+  
   const template = getWorkflowCase(quote.workflowKey ?? quote.key);
   const objective = normalizeObjective(quote.objective) || template.title;
   const traceId = quote.traceId || buildTraceId(template.key, objective);
@@ -248,6 +251,8 @@ export async function buildWorkflowRun({ quote }) {
       mppAmount += parseFloat(tier.amount);
     }
   }
+
+  console.log("[Workflow] MPP Amount:", mppAmount);
   
   if (mppAmount > 0) {
     escrowHold = await createEscrowHold(
@@ -256,7 +261,10 @@ export async function buildWorkflowRun({ quote }) {
     );
   }
   
+  console.log("[Workflow] Executing AI workflow...");
   const aiResult = await executeWorkflow(template.key, objective);
+  console.log("[Workflow] AI Result success:", aiResult.success);
+  console.log("[Workflow] AI Result:", JSON.stringify(aiResult, null, 2));
   
   const finalCost = paymentTiers.reduce((sum, t) => sum + parseFloat(t.amount), 0);
   
