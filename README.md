@@ -162,29 +162,8 @@ Final transaction anchoring the receipt on-chain. Produces a verifiable transact
 
 ---
 
-## Setup
 
-1. Clone the repository
-2. Copy `.env.example` to `.env`
-3. Add your API keys:
-   - `OPENROUTER_API_KEY` - Get from [openrouter.ai](https://openrouter.ai/keys)
-   - `STELLAR_SECRET_KEY` - Testnet secret from [laboratory.stellar.org](https://laboratory.stellar.org)
-   - `STELLAR_PUBLIC_KEY` - Your Stellar testnet public key
-4. Run `npm install`
-5. Run `npm run dev`
 
----
-
-## Without API Keys
-
-The app runs in **simulation mode** without API keys configured. The UI and flow work completely, but:
-
-- AI returns simulated results
-- Payments show as simulated transactions
-
-For full functionality, configure the API keys above.
-
----
 
 ## License
 
